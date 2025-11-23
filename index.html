@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoManager - Gestion Véhicules</title>
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AutoManager">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Google Fonts: Inter for a premium feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">🚗</div>
+                <h1>AutoManager</h1>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard">
+                    <span class="icon">📊</span> Tableau de bord
+                </li>
+                <li data-view="vehicles">
+                    <span class="icon">🚘</span> Véhicules
+                </li>
+                <li data-view="documents">
+                    <span class="icon">📄</span> Documents
+                </li>
+                <li data-view="maintenance">
+                    <span class="icon">🔧</span> Entretien
+                </li>
+                <li data-view="settings">
+                    <span class="icon">⚙️</span> Paramètres
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <h2 id="page-title">Tableau de bord</h2>
+                <div class="user-profile">
+                    <span class="notification-badge">🔔</span>
+                    <div class="avatar">U</div>
+                </div>
+            </header>
+
+            <div id="view-container" class="content-area">
+                <!-- Dynamic Content Will Be Injected Here -->
+                <div class="welcome-card">
+                    <h3>Bienvenue sur AutoManager</h3>
+                    <p>Sélectionnez une option dans le menu pour commencer.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/car_data.js"></script>
+    <script src="js/vehicle.js"></script>
+    <script src="js/document.js"></script>
+    <script src="js/maintenance.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/notification.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
