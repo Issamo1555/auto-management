@@ -42,6 +42,22 @@ class MaintenanceManager {
         window.StorageManager.remove(this.STORAGE_KEY, id);
     }
 
+    update(id, data) {
+        const records = this.getAll();
+        const index = records.findIndex(r => r.id === id);
+        if (index !== -1) {
+            const updatedRecord = {
+                ...records[index],
+                ...data,
+                id: id,
+                cost: parseFloat(data.cost) || 0
+            };
+            window.StorageManager.update(this.STORAGE_KEY, updatedRecord);
+            return updatedRecord;
+        }
+        return null;
+    }
+
     getTotalCost(vehicleId) {
         const records = this.getByVehicle(vehicleId);
         return records.reduce((sum, record) => sum + (parseFloat(record.cost) || 0), 0);
@@ -55,7 +71,7 @@ class MaintenanceManager {
         if (vehicles.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">🔧</div>
+                    <div class="empty-icon">⚒</div>
                     <p>Aucun véhicule trouvé.</p>
                     <p class="sub-text">Ajoutez un véhicule pour suivre son entretien.</p>
                     <button class="btn btn-primary" style="margin-top:1rem" onclick="document.querySelector('[data-view=vehicles]').click()">
@@ -104,9 +120,10 @@ class MaintenanceManager {
                             </div>
                             <div class="form-group">
                                 <label>Type</label>
-                                <select name="type" required class="form-select" style="width:100%">
+                                <select name="type" id="input-maint-type" required class="form-select" style="width:100%">
                                     ${this.types.map(t => `<option value="${t}">${t}</option>`).join('')}
                                 </select>
+                                <input type="text" id="input-maint-type-other" name="typeOther" class="hidden" placeholder="Saisir le type d'intervention" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                             </div>
                         </div>
 
@@ -197,21 +214,16 @@ class MaintenanceManager {
                             </div>
                             ${rec.notes ? `<div class="maint-notes">${rec.notes}</div>` : ''}
                         </div>
-                        <button class="btn-icon delete-maint" data-id="${rec.id}" title="Supprimer">🗑️</button>
+                        <div class="card-actions">
+                            <button class="btn-icon edit-maint" data-id="${rec.id}" title="Modifier">✎</button>
+                            <button class="btn-icon delete-maint" data-id="${rec.id}" title="Supprimer">✕</button>
+                        </div>
                     </div>
                 `).join('')}
             </div>
         `;
 
-        // Attach Delete
-        listContainer.querySelectorAll('.delete-maint').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (confirm('Supprimer cette intervention ?')) {
-                    this.delete(btn.getAttribute('data-id'));
-                    this._renderMaintenanceList(container, vehicleId);
-                }
-            });
-        });
+
     }
 
     _attachEvents(container) {
@@ -221,12 +233,36 @@ class MaintenanceManager {
         const form = container.querySelector('#form-add-maint');
         const selector = container.querySelector('#vehicle-selector-maint');
 
+        // Custom Maintenance Type Logic
+        const typeSelect = container.querySelector('#input-maint-type');
+        const typeOtherInput = container.querySelector('#input-maint-type-other');
+
+        if (typeSelect && typeOtherInput) {
+            typeSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'Autre') {
+                    typeOtherInput.classList.remove('hidden');
+                    typeOtherInput.required = true;
+                } else {
+                    typeOtherInput.classList.add('hidden');
+                    typeOtherInput.required = false;
+                    typeOtherInput.value = '';
+                }
+            });
+        }
+
         selector.addEventListener('change', (e) => {
             this._renderMaintenanceList(container, e.target.value);
         });
 
         btnAdd.addEventListener('click', () => {
             container.querySelector('#modal-vehicle-id-maint').value = selector.value;
+
+            // Reset custom input
+            if (typeOtherInput) {
+                typeOtherInput.classList.add('hidden');
+                typeOtherInput.required = false;
+            }
+
             modal.classList.remove('hidden');
         });
 
@@ -236,15 +272,115 @@ class MaintenanceManager {
             });
         });
 
+        // Handle Form Submit
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            this.add(data);
+            // Handle "Other" type
+            if (data.type === 'Autre') {
+                data.type = data.typeOther;
+            }
+            delete data.typeOther;
+
+            if (form.dataset.editingId) {
+                this.update(form.dataset.editingId, data);
+                delete form.dataset.editingId;
+            } else {
+                this.add(data);
+            }
+
             modal.classList.add('hidden');
-            this._renderMaintenanceList(container, selector.value);
+            form.reset();
+            // Re-render list
+            this._renderMaintenanceList(container, container.querySelector('#vehicle-selector-maint').value);
         });
+
+        // Event Delegation for Maintenance Actions
+        const listContainer = container.querySelector('#maintenance-list-container');
+        if (listContainer) {
+            listContainer.addEventListener('click', (e) => {
+                const target = e.target;
+
+                // Delete
+                const deleteBtn = target.closest('.delete-maint');
+                if (deleteBtn) {
+                    const recId = deleteBtn.getAttribute('data-id');
+                    const modal = document.getElementById('modal-confirm');
+                    const msg = document.getElementById('confirm-message');
+                    const btnOk = document.getElementById('btn-confirm-ok');
+                    const btnCancel = document.getElementById('btn-confirm-cancel');
+                    const btnClose = document.getElementById('close-confirm-modal');
+
+                    if (!modal) {
+                        if (confirm('Supprimer cette intervention ?')) {
+                            this.delete(recId);
+                            this._renderMaintenanceList(container, container.querySelector('#vehicle-selector-maint').value);
+                        }
+                        return;
+                    }
+
+                    msg.textContent = 'Êtes-vous sûr de vouloir supprimer cette intervention ?';
+                    modal.classList.remove('hidden');
+
+                    const newBtnOk = btnOk.cloneNode(true);
+                    btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+
+                    const newBtnCancel = btnCancel.cloneNode(true);
+                    btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+
+                    const newBtnClose = btnClose.cloneNode(true);
+                    btnClose.parentNode.replaceChild(newBtnClose, btnClose);
+
+                    newBtnOk.addEventListener('click', () => {
+                        this.delete(recId);
+                        modal.classList.add('hidden');
+                        this._renderMaintenanceList(container, container.querySelector('#vehicle-selector-maint').value);
+                    });
+
+                    const closeModal = () => {
+                        modal.classList.add('hidden');
+                    };
+
+                    newBtnCancel.addEventListener('click', closeModal);
+                    newBtnClose.addEventListener('click', closeModal);
+
+                    return;
+                }
+
+                // Edit
+                const editBtn = target.closest('.edit-maint');
+                if (editBtn) {
+                    const recId = editBtn.getAttribute('data-id');
+                    const rec = this.getAll().find(r => r.id === recId); // Assuming getAll() returns all records, or a more specific get(id) method exists
+                    if (rec) {
+                        this._openEditModal(container, rec);
+                    }
+                    return;
+                }
+            });
+        }
+    }
+
+    _openEditModal(container, rec) {
+        const modal = container.querySelector('#modal-add-maint');
+        const form = container.querySelector('#form-add-maint');
+        const title = modal.querySelector('.modal-header h4');
+
+        title.textContent = 'Modifier l\'Intervention';
+        form.dataset.editingId = rec.id;
+
+        // Fill form
+        form.querySelector('[name="vehicleId"]').value = rec.vehicleId;
+        form.querySelector('[name="date"]').value = rec.date;
+        form.querySelector('[name="type"]').value = rec.type;
+        form.querySelector('[name="mileage"]').value = rec.mileage || '';
+        form.querySelector('[name="cost"]').value = rec.cost || '';
+        form.querySelector('[name="notes"]').value = rec.notes || '';
+        form.querySelector('[name="provider"]').value = rec.provider || '';
+
+        modal.classList.remove('hidden');
     }
 }
 

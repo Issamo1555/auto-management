@@ -1,19 +1,19 @@
-const CACHE_NAME = 'automanager-v1';
+const CACHE_NAME = 'automanager-v1.2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/main.css',
-    '/js/app.js',
-    '/js/storage.js',
-    '/js/vehicle.js',
-    '/js/document.js',
-    '/js/maintenance.js',
-    '/js/dashboard.js',
-    '/js/settings.js',
-    '/js/notification.js',
-    '/js/charts.js',
-    '/js/utils.js',
-    '/js/car_data.js'
+    './',
+    './index.html',
+    './css/main.css',
+    './js/app.js',
+    './js/storage.js',
+    './js/vehicle.js',
+    './js/document.js',
+    './js/maintenance.js',
+    './js/dashboard.js',
+    './js/settings.js',
+    './js/notification.js',
+    './js/charts.js',
+    './js/utils.js',
+    './js/car_data.js'
 ];
 
 // Install event - cache files

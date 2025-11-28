@@ -66,20 +66,30 @@ class VehicleManager {
                     </div>
                     <form id="form-add-vehicle">
                         <div class="form-group">
+                            <label>Type de véhicule</label>
+                            <select name="vehicleType" id="input-vehicle-type" required class="form-select">
+                                <option value="">Sélectionner un type</option>
+                                <option value="car">Voiture</option>
+                                <option value="motorcycle">Moto</option>
+                                <option value="truck">Camion</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Marque</label>
                             <div style="display:flex; gap:10px; align-items:center;">
-                                <select name="make" id="input-make" required class="form-select" style="flex:1">
-                                    <option value="">Sélectionner une marque</option>
-                                    ${window.CarData.map(c => `<option value="${c.brand}">${c.brand}</option>`).join('')}
+                                <select name="make" id="input-make" required class="form-select" style="flex:1" disabled>
+                                    <option value="">Sélectionner d'abord un type</option>
                                 </select>
                                 <img id="preview-logo" src="" style="width:30px; height:30px; object-fit:contain; display:none;">
                             </div>
+                            <input type="text" id="input-make-other" name="makeOther" class="hidden" placeholder="Saisir la marque" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         <div class="form-group">
                             <label>Modèle</label>
                             <select name="model" id="input-model" required class="form-select" disabled>
                                 <option value="">Sélectionner d'abord une marque</option>
                             </select>
+                            <input type="text" id="input-model-other" name="modelOther" class="hidden" placeholder="Saisir le modèle" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -133,7 +143,7 @@ class VehicleManager {
         if (vehicles.length === 0) {
             return `
                 <div class="empty-state">
-                    <div class="empty-icon">🚗</div>
+                    <div class="empty-icon">▶</div>
                     <p>Aucun véhicule enregistré.</p>
                     <p class="sub-text">Ajoutez votre premier véhicule pour commencer le suivi.</p>
                 </div>
@@ -144,27 +154,28 @@ class VehicleManager {
             <div class="vehicle-grid">
                 ${vehicles.map(v => `
                     <div class="vehicle-card">
+                        <div class="vehicle-photo-placeholder">
+                            ${v.photo ? `<img src="${v.photo}" class="vehicle-photo-img" alt="${v.make}">` : this._getVehicleIcon(v.vehicleType || 'car')}
+                        </div>
                         <div class="card-header">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                ${v.photo ? `<img src="${v.photo}" style="width:40px; height:40px; object-fit:cover; border-radius:50%;">` : (v.logo ? `<img src="${v.logo}" style="width:24px; height:24px; object-fit:contain;">` : '')}
-                                <h4 class="vehicle-title">${v.make} ${v.model}</h4>
-                            </div>
+                            <h4 class="vehicle-title">${v.make} ${v.model}</h4>
                             <span class="vehicle-year">${v.year}</span>
                         </div>
                         <div class="card-body">
-                            <div class="info-row">
-                                <span class="label">Plaque:</span>
-                                <span class="value">${v.plate}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Km:</span>
-                                <span class="value">${parseInt(v.mileage).toLocaleString()} km</span>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Plaque</span>
+                                    <span class="info-value">${v.plate}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Kilométrage</span>
+                                    <span class="info-value">${parseInt(v.mileage).toLocaleString()} km</span>
+                                </div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button class="btn-icon edit-vehicle" data-id="${v.id}" title="Modifier">✏️</button>
-                            <button class="btn-icon delete-vehicle" data-id="${v.id}" title="Supprimer">🗑️</button>
-                            <button class="btn-text" data-id="${v.id}">Détails →</button>
+                            <button class="btn-icon edit-vehicle" onclick="window.VehicleManager.promptEdit('${v.id}')" title="Modifier">✎</button>
+                            <button class="btn-icon delete-vehicle" onclick="window.VehicleManager.promptDelete('${v.id}')" title="Supprimer">✕</button>
                         </div>
                     </div>
                 `).join('')}
@@ -201,13 +212,7 @@ class VehicleManager {
                 }
             });
         }
-        // Details button listener
-        container.querySelectorAll('.btn-text[data-id]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.getAttribute('data-id');
-                this.showVehicleDetails(id);
-            });
-        });
+
         // Close details modal
         const closeDetailsBtn = container.querySelector('#close-vehicle-details');
         if (closeDetailsBtn) {
@@ -217,19 +222,94 @@ class VehicleManager {
             });
         }
 
-        // Dropdown Logic
+        // Vehicle Type Dropdown Logic
+        const vehicleTypeSelect = container.querySelector('#input-vehicle-type');
         const makeSelect = container.querySelector('#input-make');
         const modelSelect = container.querySelector('#input-model');
         const logoPreview = container.querySelector('#preview-logo');
 
+        // Custom Inputs
+        const makeOtherInput = container.querySelector('#input-make-other');
+        const modelOtherInput = container.querySelector('#input-model-other');
+
+        // Helper to toggle custom input
+        const toggleCustomInput = (select, input) => {
+            if (select.value === 'Autre') {
+                input.classList.remove('hidden');
+                input.required = true;
+            } else {
+                input.classList.add('hidden');
+                input.required = false;
+                input.value = '';
+            }
+        };
+
+        if (vehicleTypeSelect && makeSelect) {
+            vehicleTypeSelect.addEventListener('change', (e) => {
+                const vehicleType = e.target.value;
+                let brandData;
+
+                // Select appropriate dataset
+                if (vehicleType === 'car') {
+                    brandData = window.CarData;
+                } else if (vehicleType === 'motorcycle') {
+                    brandData = window.MotorcycleData;
+                } else if (vehicleType === 'truck') {
+                    brandData = window.TruckData;
+                }
+
+                // Reset and populate brand dropdown
+                makeSelect.innerHTML = '<option value="">Sélectionner une marque</option>';
+                makeSelect.disabled = !vehicleType;
+                modelSelect.innerHTML = '<option value="">Sélectionner d\'abord une marque</option>';
+                modelSelect.disabled = true;
+                logoPreview.style.display = 'none';
+
+                // Hide custom inputs
+                makeOtherInput.classList.add('hidden');
+                modelOtherInput.classList.add('hidden');
+
+                if (brandData) {
+                    brandData.forEach(brand => {
+                        const opt = document.createElement('option');
+                        opt.value = brand.brand;
+                        opt.textContent = brand.brand;
+                        makeSelect.appendChild(opt);
+                    });
+
+                    // Add "Autre" option
+                    const optOther = document.createElement('option');
+                    optOther.value = "Autre";
+                    optOther.textContent = "Autre / Inconnu";
+                    makeSelect.appendChild(optOther);
+                }
+            });
+        }
+
+        // Dropdown Logic
         if (makeSelect) {
             makeSelect.addEventListener('change', (e) => {
                 const brandName = e.target.value;
-                const brandData = window.CarData.find(c => c.brand === brandName);
+                toggleCustomInput(makeSelect, makeOtherInput);
+
+                const vehicleType = vehicleTypeSelect ? vehicleTypeSelect.value : 'car';
+
+                // Get correct dataset
+                let dataSource;
+                if (vehicleType === 'motorcycle') {
+                    dataSource = window.MotorcycleData;
+                } else if (vehicleType === 'truck') {
+                    dataSource = window.TruckData;
+                } else {
+                    dataSource = window.CarData;
+                }
+
+                const brandData = dataSource ? dataSource.find(c => c.brand === brandName) : null;
 
                 // Reset Model
                 modelSelect.innerHTML = '<option value="">Sélectionner un modèle</option>';
                 modelSelect.disabled = !brandName;
+                modelOtherInput.classList.add('hidden');
 
                 if (brandData) {
                     // Update Logo
@@ -241,24 +321,29 @@ class VehicleManager {
                     }
 
                     // Populate Models
-                    if (brandData.models.length > 0) {
+                    if (brandData.models && brandData.models.length > 0) {
                         brandData.models.forEach(m => {
                             const opt = document.createElement('option');
                             opt.value = m;
                             opt.innerText = m;
                             modelSelect.appendChild(opt);
                         });
-                    } else {
-                        // Allow custom input for "Autre" or unknown brands? 
-                        // For now, just add an "Autre" option
-                        const opt = document.createElement('option');
-                        opt.value = "Autre";
-                        opt.innerText = "Autre / Inconnu";
-                        modelSelect.appendChild(opt);
                     }
                 } else {
                     logoPreview.style.display = 'none';
                 }
+
+                // Always add "Autre" option for models
+                const optOther = document.createElement('option');
+                optOther.value = "Autre";
+                optOther.innerText = "Autre / Inconnu";
+                modelSelect.appendChild(optOther);
+            });
+        }
+
+        if (modelSelect) {
+            modelSelect.addEventListener('change', () => {
+                toggleCustomInput(modelSelect, modelOtherInput);
             });
         }
 
@@ -280,8 +365,30 @@ class VehicleManager {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            // Find logo URL to save
-            const brandData = window.CarData.find(c => c.brand === data.make);
+            // Handle "Other" values
+            if (data.make === 'Autre') {
+                data.make = data.makeOther;
+            }
+            if (data.model === 'Autre') {
+                data.model = data.modelOther;
+            }
+
+            // Cleanup temp fields
+            delete data.makeOther;
+            delete data.modelOther;
+
+            // Find logo URL to save (only if standard brand)
+            let dataSource;
+            const vehicleType = data.vehicleType || 'car';
+            if (vehicleType === 'motorcycle') {
+                dataSource = window.MotorcycleData;
+            } else if (vehicleType === 'truck') {
+                dataSource = window.TruckData;
+            } else {
+                dataSource = window.CarData;
+            }
+
+            const brandData = dataSource ? dataSource.find(c => c.brand === data.make) : null;
             if (brandData && brandData.logo) {
                 data.logo = brandData.logo;
             }
@@ -296,27 +403,31 @@ class VehicleManager {
             this.renderView(container); // Re-render to show new vehicle
         });
 
-        // Handle Delete
-        container.querySelectorAll('.delete-vehicle').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
-                    const id = e.target.getAttribute('data-id');
-                    this.delete(id);
-                    this.renderView(container);
-                }
-            });
-        });
+        // Event Delegation for Vehicle Actions (Delete, Edit, Details)
+        // We are now using inline onclick handlers for robustness against re-renders
+        // See promptDelete() and promptEdit() methods below
 
-        // Handle Edit
-        container.querySelectorAll('.edit-vehicle').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = e.target.getAttribute('data-id');
-                const vehicle = this.getAll().find(v => v.id === id);
-                if (vehicle) {
-                    this._openEditModal(container, vehicle);
+        // Details (Note: Details button might be inside the card but not in footer, check HTML)
+        // In updated HTML, details are shown by clicking the card or specific elements?
+        // The previous code had .btn-text[data-id] for details, but new card design removed "Details ->" button.
+        // However, let's keep it if there are any, or if we want to make the whole card clickable (except buttons).
+
+        // If we want to make the whole card clickable for details (except actions):
+        const vehicleGrid = container.querySelector('.vehicle-grid');
+        if (vehicleGrid) {
+            vehicleGrid.addEventListener('click', (e) => {
+                const target = e.target;
+                const card = target.closest('.vehicle-card');
+                const deleteBtn = target.closest('.delete-vehicle');
+                const editBtn = target.closest('.edit-vehicle');
+
+                if (card && !deleteBtn && !editBtn) {
+                    // Optional: Make card clickable for details
+                    // const id = deleteBtn ? deleteBtn.getAttribute('data-id') : (editBtn ? editBtn.getAttribute('data-id') : null);
+                    // For now, we rely on the specific buttons.
                 }
             });
-        });
+        }
 
         // Open Modal (Add Mode)
         btnAdd.addEventListener('click', () => {
@@ -350,41 +461,65 @@ class VehicleManager {
         form.querySelector('[name="plate"]').value = vehicle.plate;
         form.querySelector('[name="mileage"]').value = vehicle.mileage;
 
+        // Handle Vehicle Type
+        const vehicleTypeSelect = form.querySelector('#input-vehicle-type');
+        if (vehicleTypeSelect) {
+            vehicleTypeSelect.value = vehicle.vehicleType || 'car';
+            // Trigger change event to populate brands
+            vehicleTypeSelect.dispatchEvent(new Event('change'));
+        }
+
         // Handle Make/Model
         const makeSelect = form.querySelector('[name="make"]');
         const modelSelect = form.querySelector('[name="model"]');
         const logoPreview = container.querySelector('#preview-logo');
 
-        makeSelect.value = vehicle.make;
+        // Wait a bit for the vehicle type change to populate brands
+        setTimeout(() => {
+            makeSelect.value = vehicle.make;
 
-        // Populate Models based on Make
-        const brandData = window.CarData.find(c => c.brand === vehicle.make);
-        if (brandData) {
-            modelSelect.innerHTML = '<option value="">Sélectionner un modèle</option>';
-            modelSelect.disabled = false;
-
-            if (brandData.models.length > 0) {
-                brandData.models.forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m;
-                    opt.innerText = m;
-                    modelSelect.appendChild(opt);
-                });
+            // Get correct data source based on vehicle type
+            let dataSource;
+            const vehicleType = vehicle.vehicleType || 'car';
+            if (vehicleType === 'motorcycle') {
+                dataSource = window.MotorcycleData;
+            } else if (vehicleType === 'truck') {
+                dataSource = window.TruckData;
             } else {
-                const opt = document.createElement('option');
-                opt.value = "Autre";
-                opt.innerText = "Autre / Inconnu";
-                modelSelect.appendChild(opt);
+                dataSource = window.CarData;
             }
 
-            // Logo
-            if (brandData.logo) {
-                logoPreview.src = brandData.logo;
-                logoPreview.style.display = 'block';
-            }
-        }
+            // Populate Models based on Make
+            const brandData = dataSource.find(c => c.brand === vehicle.make);
+            if (brandData) {
+                modelSelect.innerHTML = '<option value="">Sélectionner un modèle</option>';
+                modelSelect.disabled = false;
 
-        modelSelect.value = vehicle.model;
+                if (brandData.models && brandData.models.length > 0) {
+                    brandData.models.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m;
+                        opt.textContent = m;
+                        modelSelect.appendChild(opt);
+                    });
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = "Autre";
+                    opt.textContent = "Autre / Inconnu";
+                    modelSelect.appendChild(opt);
+                }
+
+                // Logo
+                if (brandData.logo) {
+                    logoPreview.src = brandData.logo;
+                    logoPreview.style.display = 'block';
+                } else {
+                    logoPreview.style.display = 'none';
+                }
+            } else {
+                logoPreview.style.display = 'none';
+            }
+        }, 100);
 
         // Handle Photo
         const photoHidden = container.querySelector('#hidden-vehicle-photo');
@@ -422,6 +557,68 @@ class VehicleManager {
         `;
         body.innerHTML = html;
         modal.classList.remove('hidden');
+    }
+
+    promptDelete(id) {
+        const modal = document.getElementById('modal-confirm');
+        const msg = document.getElementById('confirm-message');
+        const btnOk = document.getElementById('btn-confirm-ok');
+        const btnCancel = document.getElementById('btn-confirm-cancel');
+        const btnClose = document.getElementById('close-confirm-modal');
+
+        if (!modal) {
+            // Fallback if modal not found
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
+                this.delete(id);
+                window.location.reload();
+            }
+            return;
+        }
+
+        // Setup Modal
+        msg.textContent = 'Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible.';
+        modal.classList.remove('hidden');
+
+        // Cleanup old listeners (simple way: clone node)
+        const newBtnOk = btnOk.cloneNode(true);
+        btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+
+        const newBtnCancel = btnCancel.cloneNode(true);
+        btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+
+        const newBtnClose = btnClose.cloneNode(true);
+        btnClose.parentNode.replaceChild(newBtnClose, btnClose);
+
+        // Attach new listeners
+        newBtnOk.addEventListener('click', () => {
+            this.delete(id);
+            modal.classList.add('hidden');
+            window.location.reload();
+        });
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        newBtnCancel.addEventListener('click', closeModal);
+        newBtnClose.addEventListener('click', closeModal);
+    }
+
+    promptEdit(id) {
+        const vehicle = this.getAll().find(v => v.id === id);
+        if (vehicle) {
+            const container = document.getElementById('view-container');
+            this._openEditModal(container, vehicle);
+        }
+    }
+
+    _getVehicleIcon(type) {
+        const icons = {
+            'car': '▶',
+            'motorcycle': '◀',
+            'truck': '▲'
+        };
+        return icons[type] || '▶';
     }
 }
 

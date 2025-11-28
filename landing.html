@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoManager - Gérez votre flotte automobile en toute simplicité</title>
+    <meta name="description"
+        content="AutoManager est votre assistant personnel pour la gestion complète de vos véhicules. Suivez l'entretien, gérez vos documents et contrôlez vos dépenses.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #6b7280;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: var(--primary);
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
+            background: var(--light);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: var(--dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .benefits h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+        }
+
+        .benefits-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .benefit-item .icon {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .benefit-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .benefit-item p {
+            color: var(--gray);
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 20px;
+            background: var(--dark);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: #111827;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            header p {
+                font-size: 1.2rem;
+            }
+
+            .features h2,
+            .benefits h2,
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header / Hero Section -->
+    <header>
+        <div class="container">
+            <h1>AutoManager</h1>
+            <p>Gérez votre flotte automobile en toute simplicité</p>
+            <a href="index.html" class="cta-button">Essayer Gratuitement</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>Fonctionnalités Principales</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">▶</div>
+                    <h3>Gestion Multi-Véhicules</h3>
+                    <p>Gérez autant de véhicules que vous le souhaitez : voitures, motos et camions. Marques et modèles
+                        pré-configurés pour une saisie rapide.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚒</div>
+                    <h3>Suivi des Entretiens</h3>
+                    <p>Enregistrez tous vos entretiens et réparations. Historique complet avec suivi du kilométrage et
+                        catégorisation par type.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">▣</div>
+                    <h3>Gestion des Documents</h3>
+                    <p>Stockez vos documents administratifs et recevez des alertes automatiques avant leur expiration.
+                        Assurance, contrôle technique, carte grise.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">■</div>
+                    <h3>Statistiques & Analyses</h3>
+                    <p>Visualisez vos dépenses avec des graphiques détaillés. Répartition par type d'entretien et coûts
+                        totaux par véhicule.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◆</div>
+                    <h3>Sécurité & Confidentialité</h3>
+                    <p>Protection par code PIN et authentification biométrique (Face ID / Touch ID). Vos données restent
+                        sur votre appareil.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">■</div>
+                    <h3>Sauvegarde & Restauration</h3>
+                    <p>Exportez toutes vos données en JSON et importez-les facilement sur un nouvel appareil. Aucune
+                        perte de données.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2>Pourquoi Choisir AutoManager ?</h2>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <div class="icon">✓</div>
+                    <div>
+                        <h3>100% Gratuit & Sans Publicité</h3>
+                        <p>Aucun abonnement, aucune publicité intrusive. L'application est entièrement gratuite.</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="icon">&#10003;</div>
+                    <div>
+                        <h3>Fonctionne Hors Ligne</h3>
+                        <p>Pas besoin de connexion Internet. Vos données restent sur votre appareil, accessible à tout
+                            moment.</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="icon">&#10003;</div>
+                    <div>
+                        <h3>Respect de la Vie Privée</h3>
+                        <p>Aucune collecte de données, aucun tracking. Vos informations vous appartiennent totalement.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="icon">&#10003;</div>
+                    <div>
+                        <h3>Interface Moderne</h3>
+                        <p>Design épuré et professionnel avec mode sombre inclus. Expérience utilisateur optimale.</p>
+                    </div>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="icon">✓</div>
+                    <div>
+                        <h3>Multi-Plateforme</h3>
+                        <p>Fonctionne sur iOS, Android, Windows, Mac et Linux via n'importe quel navigateur moderne.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Gratuit</p>
+                </div>
+                <div class="stat-item">
+                    <h3>0</h3>
+                    <p>Publicité</p>
+                </div>
+                <div class="stat-item">
+                    <h3>∞</h3>
+                    <p>Véhicules</p>
+                </div>
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Hors Ligne</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Prêt à Simplifier la Gestion de Vos Véhicules ?</h2>
+            <p>Commencez dès maintenant, c'est gratuit et sans engagement</p>
+            <a href="index.html" class="cta-button">Lancer l'Application</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AutoManager Team. Tous droits réservés.</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Version 1.1.0</p>
+        </div>
+    </footer>
+</body>
+
+</html>

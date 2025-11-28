@@ -24,32 +24,36 @@ class DashboardManager {
         // Total Cost
         const totalCost = maintenance.reduce((sum, m) => sum + (parseFloat(m.cost) || 0), 0);
 
+        // Get user name from settings
+        const settings = window.SettingsManager ? window.SettingsManager.getSettings() : { userName: 'Propriétaire' };
+        const userName = settings.userName || 'Propriétaire';
+
         const html = `
             <div class="dashboard-grid">
                 <!-- Welcome Section -->
                 <div class="welcome-section">
-                    <h3>Bonjour, Propriétaire 👋</h3>
+                    <h3>Bonjour, ${userName}</h3>
                     <p>Voici un aperçu de votre flotte.</p>
                 </div>
 
                 <!-- Stats Cards -->
                 <div class="stats-row">
-                    <div class="dash-card blue">
-                        <div class="dash-icon">🚘</div>
+                    <div class="dash-card blue" onclick="document.querySelector('[data-view=vehicles]').click()" style="cursor: pointer;">
+                        <div class="dash-icon">▶</div>
                         <div class="dash-info">
                             <span class="dash-value">${totalVehicles}</span>
                             <span class="dash-label">Véhicules</span>
                         </div>
                     </div>
-                    <div class="dash-card ${activeAlerts > 0 ? 'red' : 'green'}">
-                        <div class="dash-icon">🔔</div>
+                    <div class="dash-card ${activeAlerts > 0 ? 'red' : 'green'}" onclick="document.querySelector('[data-view=documents]').click()" style="cursor: pointer;">
+                        <div class="dash-icon">◉</div>
                         <div class="dash-info">
                             <span class="dash-value">${activeAlerts}</span>
                             <span class="dash-label">Alertes</span>
                         </div>
                     </div>
-                    <div class="dash-card purple">
-                        <div class="dash-icon">💶</div>
+                    <div class="dash-card purple" onclick="document.querySelector('[data-view=maintenance]').click()" style="cursor: pointer;">
+                        <div class="dash-icon">$</div>
                         <div class="dash-info">
                             <span class="dash-value">${totalCost.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}</span>
                             <span class="dash-label">Dépenses Totales</span>
@@ -62,32 +66,22 @@ class DashboardManager {
                 <div class="charts-row">
                     <div class="chart-container">
                         <h4>Coût cumulé dans le temps</h4>
-                        <canvas id="chart-cost-time"></canvas>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-cost-time"></canvas>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <h4>Répartition par type</h4>
-                        <canvas id="chart-cost-type"></canvas>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-cost-type"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="section-title">Actions Rapides</div>
-                <div class="quick-actions">
-                    <button class="action-btn" onclick="document.querySelector('[data-view=vehicles]').click()">
-                        <span>➕</span> Ajouter un Véhicule
-                    </button>
-                    <button class="action-btn" onclick="document.querySelector('[data-view=documents]').click()">
-                        <span>📄</span> Gérer les Documents
-                    </button>
-                    <button class="action-btn" onclick="document.querySelector('[data-view=maintenance]').click()">
-                        <span>🔧</span> Noter un Entretien
-                    </button>
-                </div>
-
-                <!-- Recent Activity (Mockup for now, could be real) -->
-                <div class="section-title">Activité Récente</div>
+                <!-- Notifications -->
+                <div class="section-title">Notifications</div>
                 <div class="recent-list">
-                    ${this._renderRecentActivity(maintenance, documents)}
+                    ${this._renderNotifications(documents)}
                 </div>
             </div>
         `;
@@ -107,32 +101,58 @@ class DashboardManager {
         }
     }
 
-    _renderRecentActivity(maintenance, documents) {
-        // Combine and sort by date (newest first)
-        const combined = [
-            ...maintenance.map(m => ({ ...m, category: 'maintenance', date: m.date })),
-            ...documents.map(d => ({ ...d, category: 'document', date: d.createdAt })) // Use creation date for docs for now
-        ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5); // Top 5
-
-        if (combined.length === 0) {
-            return '<p class="text-muted">Aucune activité récente.</p>';
+    _renderNotifications(documents) {
+        if (!window.DocumentManager) {
+            return '<p class="text-muted">Aucune notification.</p>';
         }
 
-        return combined.map(item => {
-            const isMaint = item.category === 'maintenance';
+        const notifications = [];
+
+        documents.forEach(doc => {
+            const status = window.DocumentManager.getStatus(doc.expiryDate);
+            const vehicle = window.VehicleManager?.getAll().find(v => v.id === doc.vehicleId);
+            const vehicleName = vehicle ? `${vehicle.make} ${vehicle.model}` : 'Véhicule';
+
+            if (status === 'expired') {
+                notifications.push({
+                    type: 'error',
+                    icon: '🔴',
+                    title: `${doc.type} expiré`,
+                    message: `${vehicleName} - Expiré le ${new Date(doc.expiryDate).toLocaleDateString()}`,
+                    date: new Date(doc.expiryDate)
+                });
+            } else if (status === 'warning') {
+                const expiry = new Date(doc.expiryDate);
+                const diffDays = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
+                notifications.push({
+                    type: 'warning',
+                    icon: '🟠',
+                    title: `${doc.type} à renouveler`,
+                    message: `${vehicleName} - Expire dans ${diffDays} jour(s)`,
+                    date: expiry
+                });
+            }
+        });
+
+        if (notifications.length === 0) {
             return `
-                <div class="activity-item">
-                    <div class="activity-icon ${isMaint ? 'bg-blue' : 'bg-green'}">
-                        ${isMaint ? '🔧' : '📄'}
-                    </div>
-                    <div class="activity-info">
-                        <div class="activity-title">${isMaint ? item.type : 'Nouveau document: ' + item.type}</div>
-                        <div class="activity-date">${new Date(item.date).toLocaleDateString()}</div>
-                    </div>
-                    ${isMaint ? `<div class="activity-cost">${parseFloat(item.cost).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</div>` : ''}
+                <div class="empty-notification">
+                    <span style="font-size:2rem;">✅</span>
+                    <p>Aucune notification</p>
+                    <p class="sub-text">Tous vos documents sont à jour !</p>
                 </div>
             `;
-        }).join('');
+        }
+
+        return notifications.map(notif => `
+            <div class="notification-item ${notif.type}">
+                <span class="notif-icon">${notif.icon}</span>
+                <div class="notif-content">
+                    <div class="notif-title">${notif.title}</div>
+                    <div class="notif-message">${notif.message}</div>
+                </div>
+            </div>
+        `).join('');
     }
 }
 

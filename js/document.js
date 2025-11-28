@@ -111,9 +111,10 @@ class DocumentManager {
                         
                         <div class="form-group">
                             <label>Type de document</label>
-                            <select name="type" required class="form-select">
+                            <select name="type" id="input-doc-type" required class="form-select">
                                 ${this.docTypes.map(t => `<option value="${t}">${t}</option>`).join('')}
                             </select>
+                            <input type="text" id="input-doc-type-other" name="typeOther" class="hidden" placeholder="Saisir le type de document" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         
                         <div class="form-group">
@@ -189,7 +190,7 @@ class DocumentManager {
             const status = this.getStatus(doc.expiryDate);
             return `
                     <div class="document-card status-${status}">
-                        <div class="doc-icon">📄</div>
+                        <div class="doc-icon">▣</div>
                         <div class="doc-info">
                             <div class="doc-header">
                                 <span class="doc-type">${doc.type}</span>
@@ -197,36 +198,18 @@ class DocumentManager {
                             </div>
                             <div class="doc-date">Expire le: ${new Date(doc.expiryDate).toLocaleDateString()}</div>
                             ${doc.notes ? `<div class="doc-notes">${doc.notes}</div>` : ''}
-                            ${doc.photo ? `<div style="margin-top:0.5rem;"><a href="${doc.photo}" target="_blank" style="font-size:0.85rem; color:var(--primary-color); text-decoration:none;">📷 Voir la photo</a></div>` : ''}
+                            ${doc.photo ? `<div style="margin-top:0.5rem;"><img src="${doc.photo}" style="max-width:100%; max-height:150px; border-radius:8px; cursor:pointer;" onclick="window.open('${doc.photo}', '_blank')" alt="Document photo" /></div>` : ''}
                         </div>
                         <div class="card-actions">
-                            <button class="btn-icon edit-doc" data-id="${doc.id}" title="Modifier">✏️</button>
-                            <button class="btn-icon delete-doc" data-id="${doc.id}" title="Supprimer">🗑️</button>
+                            <button class="btn-icon edit-doc" data-id="${doc.id}" title="Modifier">✎</button>
+                            <button class="btn-icon delete-doc" data-id="${doc.id}" title="Supprimer">✕</button>
                         </div>
                     </div>
                 `}).join('')}
             </div>
         `;
 
-        // Re-attach events
-        listContainer.querySelectorAll('.delete-doc').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (confirm('Supprimer ce document ?')) {
-                    this.delete(btn.getAttribute('data-id'));
-                    this._renderDocumentList(container, vehicleId);
-                }
-            });
-        });
 
-        listContainer.querySelectorAll('.edit-doc').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const docId = btn.getAttribute('data-id');
-                const doc = documents.find(d => d.id === docId);
-                if (doc) {
-                    this._openEditModal(container, doc);
-                }
-            });
-        });
     }
 
     _openEditModal(container, doc) {
@@ -293,6 +276,23 @@ class DocumentManager {
             });
         }
 
+        // Custom Doc Type Logic
+        const typeSelect = container.querySelector('#input-doc-type');
+        const typeOtherInput = container.querySelector('#input-doc-type-other');
+
+        if (typeSelect && typeOtherInput) {
+            typeSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'Autre') {
+                    typeOtherInput.classList.remove('hidden');
+                    typeOtherInput.required = true;
+                } else {
+                    typeOtherInput.classList.add('hidden');
+                    typeOtherInput.required = false;
+                    typeOtherInput.value = '';
+                }
+            });
+        }
+
         // Vehicle Selector Change
         selector.addEventListener('change', (e) => {
             this._renderDocumentList(container, e.target.value);
@@ -306,6 +306,12 @@ class DocumentManager {
             modal.querySelector('.modal-header h4').textContent = 'Ajouter un Document';
             if (photoPreview) photoPreview.style.display = 'none';
             if (photoHidden) photoHidden.value = '';
+
+            // Reset custom input
+            if (typeOtherInput) {
+                typeOtherInput.classList.add('hidden');
+                typeOtherInput.required = false;
+            }
 
             // Set the current vehicle ID in the hidden field
             container.querySelector('#modal-vehicle-id').value = selector.value;
@@ -325,6 +331,12 @@ class DocumentManager {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
+            // Handle "Other" type
+            if (data.type === 'Autre') {
+                data.type = data.typeOther;
+            }
+            delete data.typeOther;
+
             if (form.dataset.editingId) {
                 // Update Mode
                 this.update(form.dataset.editingId, data);
@@ -336,6 +348,71 @@ class DocumentManager {
             modal.classList.add('hidden');
             this._renderDocumentList(container, selector.value);
         });
+
+        // Event Delegation for Document Actions
+        const listContainer = container.querySelector('#document-list-container');
+        if (listContainer) {
+            listContainer.addEventListener('click', (e) => {
+                const target = e.target;
+
+                // Delete
+                const deleteBtn = target.closest('.delete-doc');
+                if (deleteBtn) {
+                    const docId = deleteBtn.getAttribute('data-id');
+                    const modal = document.getElementById('modal-confirm');
+                    const msg = document.getElementById('confirm-message');
+                    const btnOk = document.getElementById('btn-confirm-ok');
+                    const btnCancel = document.getElementById('btn-confirm-cancel');
+                    const btnClose = document.getElementById('close-confirm-modal');
+
+                    if (!modal) {
+                        if (confirm('Supprimer ce document ?')) {
+                            this.delete(docId);
+                            this._renderDocumentList(container, selector.value);
+                        }
+                        return;
+                    }
+
+                    msg.textContent = 'Êtes-vous sûr de vouloir supprimer ce document ?';
+                    modal.classList.remove('hidden');
+
+                    const newBtnOk = btnOk.cloneNode(true);
+                    btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+
+                    const newBtnCancel = btnCancel.cloneNode(true);
+                    btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+
+                    const newBtnClose = btnClose.cloneNode(true);
+                    btnClose.parentNode.replaceChild(newBtnClose, btnClose);
+
+                    newBtnOk.addEventListener('click', () => {
+                        this.delete(docId);
+                        modal.classList.add('hidden');
+                        this._renderDocumentList(container, selector.value);
+                    });
+
+                    const closeModal = () => {
+                        modal.classList.add('hidden');
+                    };
+
+                    newBtnCancel.addEventListener('click', closeModal);
+                    newBtnClose.addEventListener('click', closeModal);
+
+                    return;
+                }
+
+                // Edit
+                const editBtn = target.closest('.edit-doc');
+                if (editBtn) {
+                    const docId = editBtn.getAttribute('data-id');
+                    const doc = this.getAll().find(d => d.id === docId);
+                    if (doc) {
+                        this._openEditModal(container, doc);
+                    }
+                    return;
+                }
+            });
+        }
     }
 }
 
