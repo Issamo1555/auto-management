@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Helper function to check if user is active
+    function isActive() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isActive == true;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Anyone authenticated can read their own user document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Admins can read all users
+      allow read: if isAdmin();
+      
+      // Users can create their own document during registration
+      allow create: if isAuthenticated() && 
+                      request.auth.uid == userId &&
+                      request.resource.data.role == 'user'; // Default role is user
+      
+      // Users can update their own profile (except role and isActive)
+      allow update: if isAuthenticated() && 
+                      request.auth.uid == userId &&
+                      request.resource.data.role == resource.data.role &&
+                      request.resource.data.isActive == resource.data.isActive;
+      
+      // Only admins can update role and isActive
+      allow update: if isAdmin();
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Sessions collection
+    match /sessions/{sessionId} {
+      // Users can create their own sessions
+      allow create: if isAuthenticated() && 
+                      request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own sessions
+      allow update: if isAuthenticated() && 
+                      resource.data.userId == request.auth.uid;
+      
+      // Admins can read all sessions
+      allow read: if isAdmin();
+      
+      // Users can read their own sessions
+      allow read: if isAuthenticated() && 
+                    resource.data.userId == request.auth.uid;
+      
+      // Admins can delete sessions
+      allow delete: if isAdmin();
+    }
+    
+    // Vehicles collection (per user)
+    match /vehicles/{vehicleId} {
+      // Users can only access their own vehicles
+      allow read, write: if isAuthenticated() && 
+                           isActive() &&
+                           request.resource.data.userId == request.auth.uid;
+      
+      allow read: if isAuthenticated() && 
+                    isActive() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // Admins can read all vehicles
+      allow read: if isAdmin();
+    }
+    
+    // Documents collection (per user)
+    match /documents/{documentId} {
+      // Users can only access their own documents
+      allow read, write: if isAuthenticated() && 
+                           isActive() &&
+                           request.resource.data.userId == request.auth.uid;
+      
+      allow read: if isAuthenticated() && 
+                    isActive() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // Admins can read all documents
+      allow read: if isAdmin();
+    }
+    
+    // Maintenance records collection (per user)
+    match /maintenance/{maintenanceId} {
+      // Users can only access their own maintenance records
+      allow read, write: if isAuthenticated() && 
+                           isActive() &&
+                           request.resource.data.userId == request.auth.uid;
+      
+      allow read: if isAuthenticated() && 
+                    isActive() &&
+                    resource.data.userId == request.auth.uid;
+      
+      // Admins can read all maintenance records
+      allow read: if isAdmin();
+    }
+    
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
