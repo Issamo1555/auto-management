@@ -68,6 +68,9 @@
                 <li data-view="best-route">
                     <span class="icon">🗺️</span> Meilleur trajet
                 </li>
+                <li data-view="parking">
+                    <span class="icon">🅿️</span> Parking Marrakech
+                </li>
                 <li data-view="car-advisor">
                     <span class="icon">💡</span> Conseiller d'Achat
                 </li>
@@ -491,6 +494,52 @@
         </div>
     </div>
 
+    <!-- Parking Finder Modal -->
+    <div id="modal-parking-finder" class="modal hidden">
+        <div class="modal-content" style="max-width: 95vw; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h4>🅿️ Trouver un Parking à Marrakech</h4>
+                <span class="close-modal" onclick="window.ParkingFinder.closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="flex: 1; overflow: hidden; display: flex; gap: 1rem; padding: 0;">
+                <!-- Left Panel: Search & Results -->
+                <div
+                    style="width: 350px; padding: 1.5rem; overflow-y: auto; border-right: 1px solid var(--border-color);">
+                    <h3 style="margin-top: 0;">Rechercher un parking</h3>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="use-current-location">
+                            <span>📍 Utiliser ma position actuelle</span>
+                        </label>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
+                            Sinon, recherche depuis le centre de Marrakech
+                        </small>
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-search-parking" style="width: 100%; margin-top: 1rem;"
+                        onclick="window.ParkingFinder.searchFromUI()">
+                        🔍 Rechercher des parkings
+                    </button>
+
+                    <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+
+                    <!-- Parking List -->
+                    <div id="parking-list">
+                        <p style="color: var(--text-secondary); text-align: center;">
+                            Cliquez sur "Rechercher" pour trouver des parkings disponibles
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Map -->
+                <div style="flex: 1; position: relative;">
+                    <div id="parking-map" style="width: 100%; height: 100%; border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/config.js?v=1.4.0"></script>
     <script src="js/utils.js?v=1.4.0"></script>
@@ -510,6 +559,7 @@
     <script src="js/qr_scanner.js?v=1.5.0"></script>
     <script src="js/comparator.js?v=1.0"></script>
     <script src="js/best_route.js?v=1.0"></script>
+    <script src="js/parking_finder.js?v=1.0"></script>
     <script src="js/vehicle.js?v=1.4.0"></script>
     <script src="js/document.js?v=1.4.0"></script>
     <script src="js/maintenance.js?v=1.4.0"></script>

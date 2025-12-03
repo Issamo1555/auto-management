@@ -323,6 +323,15 @@ class App {
             return;
         }
 
+        if (viewName === 'parking') {
+            if (window.ParkingFinder) {
+                window.ParkingFinder.openModal();
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Parking Finder non chargé.</p>';
+            }
+            return;
+        }
+
         // Fallback
         container.innerHTML = `
     < div class="welcome-card" >
