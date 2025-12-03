@@ -458,9 +458,9 @@ window.TourismDataHelpers = {
     }
 };
 
-console.log('✅ Tourism data loaded:', {
-    rentals: window.RentalAgencies.length,
-    monuments: window.HistoricalMonuments.length,
-    restaurants: window.TopRestaurants.length,
-    cities: window.TourismDataHelpers.getAllCities()
-});
+// console.log('✅ Tourism data loaded:', {
+//     rentals: window.RentalAgencies.length,
+//     monuments: window.HistoricalMonuments.length,
+//     restaurants: window.TopRestaurants.length,
+//     cities: window.TourismDataHelpers.getAllCities()
+// });
