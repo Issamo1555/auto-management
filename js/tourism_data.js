@@ -94,6 +94,82 @@ window.RentalAgencies = [
         phone: "+212 528-567890",
         address: "Boulevard Mohammed V, Agadir",
         location: { lat: 30.4278, lng: -9.5981 }
+    },
+
+    // Fès
+    {
+        id: "rent_fes_001",
+        name: "Fès Auto Services",
+        city: "Fès",
+        types: ["voiture"],
+        vehicles: [
+            { type: "voiture", category: "économique", models: ["Dacia Logan", "Fiat Panda"], pricePerDay: 240 },
+            { type: "voiture", category: "SUV", models: ["Dacia Duster"], pricePerDay: 420 }
+        ],
+        rating: 4.3,
+        reviews: 78,
+        services: ["assurance", "GPS", "aéroport"],
+        phone: "+212 535-678901",
+        address: "Avenue Hassan II, Fès",
+        location: { lat: 34.0181, lng: -5.0078 }
+    },
+
+    // Rabat
+    {
+        id: "rent_rab_001",
+        name: "Capital Rent",
+        city: "Rabat",
+        types: ["voiture", "moto"],
+        vehicles: [
+            { type: "voiture", category: "économique", models: ["Renault Clio"], pricePerDay: 270 },
+            { type: "voiture", category: "luxe", models: ["Audi A3", "BMW Série 1"], pricePerDay: 750 },
+            { type: "moto", category: "scooter", models: ["Yamaha NMAX"], pricePerDay: 180 }
+        ],
+        rating: 4.6,
+        reviews: 142,
+        services: ["assurance", "GPS", "livraison", "chauffeur"],
+        phone: "+212 537-789012",
+        address: "Avenue Mohammed V, Rabat",
+        location: { lat: 34.0209, lng: -6.8416 }
+    },
+
+    // Tanger
+    {
+        id: "rent_tan_001",
+        name: "Tanger Location Plus",
+        city: "Tanger",
+        types: ["voiture", "vélo"],
+        vehicles: [
+            { type: "voiture", category: "économique", models: ["Peugeot 208"], pricePerDay: 260 },
+            { type: "voiture", category: "SUV", models: ["Peugeot 2008"], pricePerDay: 480 },
+            { type: "vélo", category: "ville", models: ["VTC Confort"], pricePerDay: 70 }
+        ],
+        rating: 4.5,
+        reviews: 89,
+        services: ["assurance", "GPS", "port"],
+        phone: "+212 539-890123",
+        address: "Boulevard Pasteur, Tanger",
+        location: { lat: 35.7595, lng: -5.8340 }
+    },
+
+    // Essaouira
+    {
+        id: "rent_ess_001",
+        name: "Essaouira Surf & Drive",
+        city: "Essaouira",
+        types: ["voiture", "vélo", "moto"],
+        vehicles: [
+            { type: "voiture", category: "économique", models: ["Dacia Sandero"], pricePerDay: 230 },
+            { type: "vélo", category: "ville", models: ["Vélo de ville"], pricePerDay: 60 },
+            { type: "vélo", category: "VTT", models: ["VTT Beach"], pricePerDay: 90 },
+            { type: "moto", category: "scooter", models: ["Vespa"], pricePerDay: 140 }
+        ],
+        rating: 4.7,
+        reviews: 156,
+        services: ["assurance", "GPS", "planche de surf"],
+        phone: "+212 524-901234",
+        address: "Avenue de l'Istiqlal, Essaouira",
+        location: { lat: 31.5125, lng: -9.7595 }
     }
 ];
 

@@ -11,6 +11,10 @@ class BestRouteManager {
         this.map = null;
         this.directionsService = null;
         this.directionsRenderer = null;
+        this.autocompleteOrigin = null;
+        this.autocompleteDestination = null;
+        this.autocompleteWaypoint = null;
+        this.placesService = null;
     }
 
     /**
@@ -47,6 +51,12 @@ class BestRouteManager {
                 strokeWeight: 5
             }
         });
+
+        // Initialize Places Service
+        this.placesService = new google.maps.places.PlacesService(this.map);
+
+        // Setup autocomplete
+        this.setupAutocomplete();
     }
 
     /**
@@ -353,6 +363,175 @@ class BestRouteManager {
         } catch (error) {
             alert('❌ Impossible d\'obtenir votre position.\n' + error.message);
         }
+    }
+
+    /**
+     * Setup Google Places Autocomplete
+     */
+    setupAutocomplete() {
+        const originInput = document.getElementById('route-origin');
+        const destinationInput = document.getElementById('route-destination');
+        const waypointInput = document.getElementById('waypoint-input');
+
+        if (originInput) {
+            this.autocompleteOrigin = new google.maps.places.Autocomplete(originInput, {
+                componentRestrictions: { country: 'ma' }, // Morocco only
+                fields: ['formatted_address', 'geometry', 'name']
+            });
+        }
+
+        if (destinationInput) {
+            this.autocompleteDestination = new google.maps.places.Autocomplete(destinationInput, {
+                componentRestrictions: { country: 'ma' },
+                fields: ['formatted_address', 'geometry', 'name']
+            });
+        }
+
+        if (waypointInput) {
+            this.autocompleteWaypoint = new google.maps.places.Autocomplete(waypointInput, {
+                componentRestrictions: { country: 'ma' },
+                fields: ['formatted_address', 'geometry', 'name']
+            });
+        }
+    }
+
+    /**
+     * Search nearby places (garages, monuments, restaurants)
+     */
+    searchNearbyPlaces(type, location) {
+        return new Promise((resolve, reject) => {
+            if (!this.placesService) {
+                reject(new Error('Places service not initialized'));
+                return;
+            }
+
+            const request = {
+                location: location,
+                radius: 5000, // 5km
+                type: type // 'car_repair', 'tourist_attraction', 'restaurant'
+            };
+
+            this.placesService.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    resolve(results);
+                } else {
+                    reject(new Error('Places search failed'));
+                }
+            });
+        });
+    }
+
+    /**
+     * Show quick suggestions (garages, monuments, restaurants)
+     */
+    async showQuickSuggestions() {
+        const container = document.getElementById('quick-suggestions');
+        if (!container) return;
+
+        // Get suggestions from tourism data
+        const suggestions = [
+            { icon: '🔧', name: 'Garages à proximité', type: 'car_repair' },
+            { icon: '🏛️', name: 'Monuments historiques', type: 'tourist_attraction' },
+            { icon: '🍽️', name: 'Restaurants', type: 'restaurant' },
+            { icon: '🅿️', name: 'Parkings', type: 'parking' }
+        ];
+
+        let html = '<div class="suggestions-grid">';
+        suggestions.forEach(sug => {
+            html += `
+                <button class="suggestion-btn" onclick="window.BestRouteManager.addSuggestionType('${sug.type}')">
+                    <span class="suggestion-icon">${sug.icon}</span>
+                    <span class="suggestion-text">${sug.name}</span>
+                </button>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    /**
+     * Add suggestion type to waypoints
+     */
+    async addSuggestionType(type) {
+        try {
+            const originInput = document.getElementById('route-origin');
+            if (!originInput || !originInput.value) {
+                alert('Veuillez d\'abord entrer un point de départ');
+                return;
+            }
+
+            // Geocode origin
+            const geocoder = new google.maps.Geocoder();
+            const result = await new Promise((resolve, reject) => {
+                geocoder.geocode({ address: originInput.value }, (results, status) => {
+                    if (status === 'OK') resolve(results[0]);
+                    else reject(new Error('Geocoding failed'));
+                });
+            });
+
+            const location = result.geometry.location;
+
+            // Search nearby places
+            const places = await this.searchNearbyPlaces(type, location);
+
+            if (places.length === 0) {
+                alert('Aucun lieu trouvé à proximité');
+                return;
+            }
+
+            // Show places selection modal
+            this.showPlacesSelection(places);
+        } catch (error) {
+            alert('Erreur: ' + error.message);
+        }
+    }
+
+    /**
+     * Show places selection modal
+     */
+    showPlacesSelection(places) {
+        const modal = document.getElementById('places-selection-modal');
+        if (!modal) return;
+
+        const list = modal.querySelector('.places-list');
+        if (!list) return;
+
+        let html = '';
+        places.slice(0, 10).forEach((place, index) => {
+            html += `
+                <div class="place-item" onclick="window.BestRouteManager.selectPlace(${index})">
+                    <div class="place-info">
+                        <strong>${place.name}</strong>
+                        <p>${place.vicinity}</p>
+                        ${place.rating ? `<span class="rating">⭐ ${place.rating}</span>` : ''}
+                    </div>
+                    <button class="btn-add">Ajouter</button>
+                </div>
+            `;
+        });
+
+        list.innerHTML = html;
+        modal.style.display = 'block';
+
+        // Store places for selection
+        this.tempPlaces = places;
+    }
+
+    /**
+     * Select a place from suggestions
+     */
+    selectPlace(index) {
+        if (!this.tempPlaces || !this.tempPlaces[index]) return;
+
+        const place = this.tempPlaces[index];
+        this.addWaypoint(place.vicinity, place.name);
+        this.renderWaypointsList();
+
+        // Close modal
+        const modal = document.getElementById('places-selection-modal');
+        if (modal) modal.style.display = 'none';
+
+        alert(`✅ ${place.name} ajouté à l'itinéraire`);
     }
 
     /**
