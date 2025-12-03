@@ -65,6 +65,9 @@
                 <li data-view="providers">
                     <span class="icon">🔧</span> Fournisseurs
                 </li>
+                <li data-view="best-route">
+                    <span class="icon">🗺️</span> Meilleur trajet
+                </li>
                 <li data-view="car-advisor">
                     <span class="icon">💡</span> Conseiller d'Achat
                 </li>
@@ -425,6 +428,69 @@
         </div>
     </div>
 
+    <!-- Best Route Modal -->
+    <div id="modal-best-route" class="modal hidden">
+        <div class="modal-content" style="max-width: 95vw; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h4>🗺️ Meilleur Trajet</h4>
+                <span class="close-modal" onclick="window.BestRouteManager.closeRouteModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="flex: 1; overflow: hidden; display: flex; gap: 1rem; padding: 0;">
+                <!-- Left Panel: Form & Results -->
+                <div
+                    style="width: 350px; padding: 1.5rem; overflow-y: auto; border-right: 1px solid var(--border-color);">
+                    <h3 style="margin-top: 0;">Planifier votre trajet</h3>
+
+                    <!-- Origin -->
+                    <div class="form-group">
+                        <label>📍 Point de départ</label>
+                        <input type="text" id="route-origin" placeholder="Adresse de départ" class="form-control">
+                        <button class="btn btn-secondary" style="margin-top: 0.5rem; width: 100%;"
+                            onclick="window.BestRouteManager.useCurrentLocation()">
+                            📍 Ma position actuelle
+                        </button>
+                    </div>
+
+                    <!-- Waypoints -->
+                    <div class="form-group">
+                        <label>🔧 Points d'arrêt (garages/fournisseurs)</label>
+                        <div id="waypoints-list" style="margin-bottom: 0.5rem;">
+                            <!-- Waypoints will be added here -->
+                        </div>
+                        <input type="text" id="waypoint-input" placeholder="Adresse du garage" class="form-control">
+                        <button class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;"
+                            onclick="window.BestRouteManager.addWaypointFromInput()">
+                            ➕ Ajouter un arrêt
+                        </button>
+                    </div>
+
+                    <!-- Destination (optional) -->
+                    <div class="form-group">
+                        <label>🏁 Destination finale (optionnel)</label>
+                        <input type="text" id="route-destination" placeholder="Retour à..." class="form-control">
+                        <small style="color: var(--text-secondary);">Laissez vide pour terminer au dernier arrêt</small>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
+                        onclick="window.BestRouteManager.calculateRoute()">
+                        🚗 Calculer l'itinéraire optimal
+                    </button>
+
+                    <!-- Route Details -->
+                    <div id="route-details" style="margin-top: 1.5rem;">
+                        <!-- Route summary will be displayed here -->
+                    </div>
+                </div>
+
+                <!-- Right Panel: Map -->
+                <div style="flex: 1; position: relative;">
+                    <div id="route-map" style="width: 100%; height: 100%; border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/config.js?v=1.4.0"></script>
     <script src="js/utils.js?v=1.4.0"></script>
@@ -443,6 +509,7 @@
     <script src="js/voice_assistant.js?v=1.5.0"></script>
     <script src="js/qr_scanner.js?v=1.5.0"></script>
     <script src="js/comparator.js?v=1.0"></script>
+    <script src="js/best_route.js?v=1.0"></script>
     <script src="js/vehicle.js?v=1.4.0"></script>
     <script src="js/document.js?v=1.4.0"></script>
     <script src="js/maintenance.js?v=1.4.0"></script>

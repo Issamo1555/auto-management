@@ -473,80 +473,102 @@ class CarAdvisor {
     }
 
     async exportAdvice(recommendations) {
-        if (!window.jspdf) {
-            alert("Erreur: Librairie PDF non chargée");
-            return;
-        }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Header
-        doc.setFontSize(20);
-        doc.setTextColor(37, 99, 235); // Primary Blue
-        doc.text("AutoManager - Conseil d'Achat", 20, 20);
-
-        doc.setFontSize(12);
-        doc.setTextColor(100);
-        doc.text(`Date: ${new Date().toLocaleDateString()
-            }`, 20, 30);
-
-        // User Criteria
-        doc.setFontSize(14);
-        doc.setTextColor(0);
-        doc.text("Vos Critères", 20, 45);
-
-        doc.setFontSize(10);
-        doc.setTextColor(80);
-        let y = 55;
-        doc.text(`Budget: ${this.userPreferences.budget.toLocaleString()} DH`, 25, y); y += 7;
-        doc.text(`Usage: ${this.userPreferences.usage} `, 25, y); y += 7;
-        doc.text(`Type: ${this.userPreferences.type_achat} `, 25, y); y += 7;
-        doc.text(`Préférences: ${this.userPreferences.marques.join(', ') || 'Aucune'} `, 25, y); y += 15;
-
-        // Recommendations
-        doc.setFontSize(14);
-        doc.setTextColor(0);
-        doc.text("Recommandations", 20, y);
-        y += 10;
-
-        recommendations.forEach((car, index) => {
-            if (y > 250) {
-                doc.addPage();
-                y = 20;
+        try {
+            // Check for jsPDF in multiple possible locations
+            let jsPDF;
+            if (window.jspdf && window.jspdf.jsPDF) {
+                jsPDF = window.jspdf.jsPDF;
+            } else if (window.jsPDF) {
+                jsPDF = window.jsPDF;
+            } else {
+                alert("❌ Erreur: La librairie PDF n'est pas chargée.\n\nVeuillez recharger la page et réessayer.");
+                console.error("jsPDF not found. Checked window.jspdf.jsPDF and window.jsPDF");
+                return;
             }
+
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(20);
+            doc.setTextColor(37, 99, 235); // Primary Blue
+            doc.text("AutoManager - Conseil d'Achat", 20, 20);
 
             doc.setFontSize(12);
-            doc.setTextColor(0);
-            doc.text(`${index + 1}. ${car.marque} ${car.modele} (${car.match}% Match)`, 25, y);
-            y += 7;
+            doc.setTextColor(100);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
 
-            doc.setFontSize(10);
-            doc.setTextColor(80);
-            doc.text(`Prix estimé: ~${car.estimatedPrice.toLocaleString()} DH`, 30, y); y += 5;
-            doc.text(`Conso: ${car.consommation.mixte} L / 100km | Coffre: ${car.coffre} L`, 30, y); y += 5;
-            doc.text(`Scores: Ville ${car.scoring.ville} /10 | Route ${car.scoring.route}/10`, 30, y); y += 10;
-        });
-
-        // AI Advice if present
-        const aiAdvice = document.getElementById('ai-advice-text');
-        if (aiAdvice && aiAdvice.textContent && !aiAdvice.textContent.includes('Chargement')) {
-            if (y > 230) {
-                doc.addPage();
-                y = 20;
-            }
+            // User Criteria
             doc.setFontSize(14);
             doc.setTextColor(0);
-            doc.text("L'avis de l'Expert IA", 20, y);
-            y += 10;
+            doc.text("Vos Critères", 20, 45);
 
             doc.setFontSize(10);
             doc.setTextColor(80);
-            const splitText = doc.splitTextToSize(aiAdvice.textContent, 170);
-            doc.text(splitText, 25, y);
-        }
+            let y = 55;
+            doc.text(`Budget: ${this.userPreferences.budget.toLocaleString()} DH`, 25, y); y += 7;
+            doc.text(`Usage: ${this.userPreferences.usage}`, 25, y); y += 7;
+            doc.text(`Type: ${this.userPreferences.type_achat}`, 25, y); y += 7;
+            doc.text(`Préférences: ${this.userPreferences.marques.join(', ') || 'Aucune'}`, 25, y); y += 15;
 
-        doc.save("conseil_achat_automanager.pdf");
+            // Recommendations
+            doc.setFontSize(14);
+            doc.setTextColor(0);
+            doc.text("Recommandations", 20, y);
+            y += 10;
+
+            recommendations.forEach((car, index) => {
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text(`${index + 1}. ${car.marque} ${car.modele} (${car.match}% Match)`, 25, y);
+                y += 7;
+
+                doc.setFontSize(10);
+                doc.setTextColor(80);
+                doc.text(`Prix estimé: ~${car.estimatedPrice.toLocaleString()} DH`, 30, y); y += 5;
+                doc.text(`Conso: ${car.consommation.mixte} L/100km | Coffre: ${car.coffre} L`, 30, y); y += 5;
+                doc.text(`Scores: Ville ${car.scoring.ville}/10 | Route ${car.scoring.route}/10`, 30, y); y += 10;
+            });
+
+            // AI Advice if present
+            const aiAdvice = document.getElementById('ai-advice-text');
+            if (aiAdvice && aiAdvice.textContent && !aiAdvice.textContent.includes('Chargement')) {
+                if (y > 230) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.setFontSize(14);
+                doc.setTextColor(0);
+                doc.text("L'avis de l'Expert IA", 20, y);
+                y += 10;
+
+                doc.setFontSize(10);
+                doc.setTextColor(80);
+                const splitText = doc.splitTextToSize(aiAdvice.textContent, 170);
+                doc.text(splitText, 25, y);
+            }
+
+            doc.save("conseil_achat_automanager.pdf");
+
+            // Show success message
+            const btn = document.getElementById('btn-export-pdf');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = "✅ PDF Téléchargé !";
+                btn.style.background = "#10b981";
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = "";
+                }, 2000);
+            }
+        } catch (error) {
+            console.error("Error exporting PDF:", error);
+            alert(`❌ Erreur lors de l'export PDF:\n${error.message}\n\nVeuillez réessayer ou contacter le support.`);
+        }
     }
 
     toggleComparison(carId, checkbox) {

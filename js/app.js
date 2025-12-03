@@ -314,6 +314,15 @@ class App {
             return;
         }
 
+        if (viewName === 'best-route') {
+            if (window.BestRouteManager) {
+                window.BestRouteManager.openRouteModal();
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Meilleur Trajet non chargé.</p>';
+            }
+            return;
+        }
+
         // Fallback
         container.innerHTML = `
     < div class="welcome-card" >

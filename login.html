@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - AutoManager</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+
+    <link rel="stylesheet" href="css/main.css?v=1.5">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header h1 {
+            color: var(--text-primary);
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .offline-mode {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            background: #fef3c7;
+            border-radius: 10px;
+            color: #92400e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">🚗</div>
+            <h1>AutoManager</h1>
+            <p>Connectez-vous à votre compte</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email" placeholder="votre@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password"
+                    placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-login" id="btn-login">
+                Se connecter
+            </button>
+        </form>
+
+        <div class="form-footer">
+            <a href="#" id="forgot-password">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="divider">ou</div>
+
+        <div class="form-footer">
+            <p>Pas encore de compte ? <a href="register.html">S'inscrire</a></p>
+        </div>
+
+        <div class="offline-mode" id="offline-mode" style="display: none;">
+            ⚠️ Mode hors ligne - <a href="index.html" style="color: #92400e; font-weight: 600;">Utiliser en local</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth-service.js"></script>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const btnLogin = document.getElementById('btn-login');
+        const alertBox = document.getElementById('alert');
+        const offlineMode = document.getElementById('offline-mode');
+
+        // Check if Firebase is available
+        if (!window.isFirebaseAvailable()) {
+            offlineMode.style.display = 'block';
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Disable button
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Connexion...';
+
+            // Attempt login
+            const result = await window.AuthService.login(email, password);
+
+            if (result.success) {
+                showAlert('Connexion réussie ! Redirection...', 'success');
+
+                // Check if user is admin
+                const isAdmin = await window.AuthService.isAdmin();
+
+                // Redirect
+                setTimeout(() => {
+                    window.location.href = isAdmin ? 'admin.html' : 'index.html';
+                }, 1000);
+            } else {
+                showAlert(result.error, 'error');
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Se connecter';
+            }
+        });
+
+        // Forgot password
+        document.getElementById('forgot-password').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+
+            if (!email) {
+                showAlert('Veuillez entrer votre adresse email', 'error');
+                return;
+            }
+
+            const result = await window.AuthService.resetPassword(email);
+
+            if (result.success) {
+                showAlert('Email de réinitialisation envoyé ! Vérifiez votre boîte de réception.', 'success');
+            } else {
+                showAlert(result.error, 'error');
+            }
+        });
+
+        // Show alert
+        function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Check if already logged in
+        window.AuthService.onAuthStateChange((user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
