@@ -1,0 +1,424 @@
+/**
+ * Tourism Module Styles
+ */
+
+/* Tourism Overview */
+.tourism-overview {
+    padding: 20px;
+}
+
+.tourism-overview h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+}
+
+/* Category Cards */
+.tourism-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.category-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.category-card:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.category-card:nth-child(3) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.category-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.category-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.category-card p {
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.category-card .btn-primary {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-card .btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Top Recommendations */
+.top-recommendations {
+    margin-top: 40px;
+}
+
+.top-recommendations h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.recommendations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Tourism Cards */
+.tourism-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tourism-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tourism-card.compact {
+    max-width: 100%;
+}
+
+.tourism-card .card-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.tourism-card .card-header h4 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.tourism-card .rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.tourism-card .stars {
+    color: #f39c12;
+}
+
+.tourism-card .rating-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.tourism-card .reviews {
+    color: #7f8c8d;
+}
+
+.tourism-card .card-body {
+    padding: 20px;
+}
+
+.tourism-card .card-body p {
+    margin-bottom: 12px;
+}
+
+/* Badges and Tags */
+.type-badge,
+.cuisine-tag,
+.service-tag,
+.feature-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.type-badge {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.cuisine-tag {
+    background: #fff3e0;
+    color: #e67e22;
+}
+
+.service-tag {
+    background: #e3f2fd;
+    color: #3498db;
+}
+
+.feature-tag {
+    background: #f3e5f5;
+    color: #9b59b6;
+}
+
+.price-indicator {
+    color: #27ae60;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+/* Monument specific */
+.monument-type {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.period {
+    font-size: 13px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.monument-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.monument-info p {
+    margin-bottom: 8px;
+}
+
+.tips {
+    background: #fff9e6;
+    padding: 12px;
+    border-left: 3px solid #f39c12;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Restaurant specific */
+.specialties ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+}
+
+.specialties li {
+    padding: 4px 0;
+    color: #555;
+}
+
+.specialties li:before {
+    content: "🍴 ";
+    margin-right: 8px;
+}
+
+/* Card Actions */
+.tourism-card .card-actions {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.tourism-card .card-actions button {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Filters */
+.rentals-filters,
+.restaurants-filters {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.rentals-filters h3,
+.restaurants-filters h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.filter-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+/* Lists */
+.rentals-list,
+.monuments-list,
+.restaurants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tourism-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rentals-list,
+    .monuments-list,
+    .restaurants-list {
+        grid-template-columns: 1fr;
+    }
+
+    .tourism-card .card-actions {
+        flex-direction: column;
+    }
+
+    .filter-buttons {
+        flex-direction: column;
+    }
+
+    .filter-btn {
+        width: 100%;
+    }
+}
+
+/* City Selector */
+#tourism-city {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#tourism-city:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Loading State */
+.tourism-loading {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.tourism-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.tourism-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.tourism-empty .icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.tourism-empty h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.tourism-empty p {
+    font-size: 16px;
+}

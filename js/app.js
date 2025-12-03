@@ -332,6 +332,27 @@ class App {
             return;
         }
 
+        if (viewName === 'tourism') {
+            if (window.TourismManager) {
+                container.innerHTML = `
+                    <div class="tourism-container">
+                        <div class="tourism-header">
+                            <select id="tourism-city" class="city-selector">
+                                ${window.TourismDataHelpers.getAllCities().map(city =>
+                    `<option value="${city}" ${city === 'Marrakech' ? 'selected' : ''}>${city}</option>`
+                ).join('')}
+                            </select>
+                        </div>
+                        <div id="tourism-content"></div>
+                    </div>
+                `;
+                window.TourismManager.init();
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Tourisme non chargé.</p>';
+            }
+            return;
+        }
+
         // Fallback
         container.innerHTML = `
     < div class="welcome-card" >
