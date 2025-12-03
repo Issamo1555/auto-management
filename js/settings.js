@@ -157,6 +157,24 @@ class SettingsManager {
                             </div>
                         </div>
 
+                        <!-- AI Configuration -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <span>🤖</span>
+                                <h4>Intelligence Artificielle</h4>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="form-group">
+                                    <label>Clé API Google Gemini</label>
+                                    <input type="password" name="geminiApiKey" value="${settings.geminiApiKey || ''}" placeholder="Collez votre clé API ici" class="form-input">
+                                    <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.5rem;">
+                                        Nécessaire pour les recommandations intelligentes. 
+                                        <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--primary-color);">Obtenir une clé</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Security Section -->
                         <div class="settings-card">
                             <div class="settings-card-header">

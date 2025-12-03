@@ -1,0 +1,345 @@
+/**
+ * Provider Data for Morocco
+ * Service providers (garages, parts suppliers) across major cities
+ */
+
+const MOROCCAN_CITIES = [
+    "Marrakech",
+    "Casablanca",
+    "Rabat",
+    "Fès",
+    "Tanger",
+    "Agadir",
+    "Meknès",
+    "Oujda",
+    "Kénitra",
+    "Tétouan"
+];
+
+const SERVICE_PROVIDERS = [
+    // Marrakech
+    {
+        id: "mrk_001",
+        name: "Clinic Car Services",
+        city: "Marrakech",
+        address: "Route de Safi, Marrakech",
+        phone: "+212 662-637-428",
+        services: ["Vidange", "Révision", "Freins", "Pneus", "Climatisation", "Diagnostic"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 5.0,
+        reviews: 45,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 31.6295, lng: -7.9811 }
+    },
+    {
+        id: "mrk_002",
+        name: "Atlas Garage",
+        city: "Marrakech",
+        address: "180, Avenue El-Khattabi, Marrakech",
+        phone: "+212 524-123-456",
+        services: ["Mécanique", "Carrosserie", "Peinture", "Vidange", "Révision"],
+        specializations: ["Renault", "Peugeot", "Citroën", "Dacia"],
+        priceRange: "$$",
+        rating: 4.5,
+        reviews: 78,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 31.6347, lng: -8.0089 }
+    },
+    {
+        id: "mrk_003",
+        name: "Smart Auto Moto",
+        city: "Marrakech",
+        address: "Quartier Industriel Sidi Ghanem, Marrakech",
+        phone: "+212 524-335-566",
+        services: ["Mécanique", "Pneumatique", "Vidange", "Carrosserie", "Électronique", "Pare-brise"],
+        specializations: ["Multi-marque"],
+        priceRange: "$$$",
+        rating: 4.7,
+        reviews: 112,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 31.6673, lng: -8.0089 }
+    },
+    {
+        id: "mrk_004",
+        name: "Nova Automobile",
+        city: "Marrakech",
+        address: "Zone Industrielle, Marrakech",
+        phone: "+212 661-675-721",
+        services: ["Tôlerie", "Carrosserie", "Peinture", "Pare-brise", "Climatisation"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.3,
+        reviews: 56,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 31.6542, lng: -7.9989 }
+    },
+    {
+        id: "mrk_005",
+        name: "SPEEDY Marrakech",
+        city: "Marrakech",
+        address: "Boulevard Mohammed VI, Marrakech",
+        phone: "+212 524-456-789",
+        services: ["Diagnostic", "Vidange", "Freins", "Pneus", "Amortisseurs", "Échappement"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.6,
+        reviews: 134,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 31.6369, lng: -8.0089 }
+    },
+
+    // Casablanca
+    {
+        id: "cas_001",
+        name: "Auto One Casablanca",
+        city: "Casablanca",
+        address: "Boulevard Zerktouni, Casablanca",
+        phone: "+212 522-987-654",
+        services: ["Vidange", "Pneumatique", "Freinage", "Amortisseurs", "Carrosserie", "Lustrage"],
+        specializations: ["Toutes marques", "Pièces authentiques"],
+        priceRange: "$$$",
+        rating: 4.8,
+        reviews: 245,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.5731, lng: -7.5898 }
+    },
+    {
+        id: "cas_002",
+        name: "GMS Auto Repair",
+        city: "Casablanca",
+        address: "Rue des Oudayas, Casablanca",
+        phone: "+212 522-456-123",
+        services: ["Mécanique", "Carrosserie", "Peinture", "Pneumatique", "Pare-brise", "Entretien"],
+        specializations: ["Multi-marque"],
+        priceRange: "$$",
+        rating: 4.5,
+        reviews: 189,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.5892, lng: -7.6031 }
+    },
+    {
+        id: "cas_003",
+        name: "SPEEDY Casablanca - Moulay Slimane",
+        city: "Casablanca",
+        address: "Boulevard Moulay Slimane, Casablanca",
+        phone: "+212 522-789-456",
+        services: ["Diagnostic", "Vidange", "Suspension", "Freinage", "Échappement", "Climatisation"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.6,
+        reviews: 201,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.5731, lng: -7.6298 }
+    },
+    {
+        id: "cas_004",
+        name: "Point S Casablanca",
+        city: "Casablanca",
+        address: "Avenue Hassan II, Casablanca",
+        phone: "+212 522-334-556",
+        services: ["Pneus", "Révision", "Freins", "Climatisation", "Vidange"],
+        specializations: ["Spécialiste pneumatique"],
+        priceRange: "$$",
+        rating: 4.4,
+        reviews: 156,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.5731, lng: -7.6198 }
+    },
+    {
+        id: "cas_005",
+        name: "TopGarage Casablanca",
+        city: "Casablanca",
+        address: "Quartier Maarif, Casablanca",
+        phone: "+212 522-567-890",
+        services: ["Réparation", "Mécanique", "Diagnostic", "Entretien", "Carrosserie"],
+        specializations: ["Toutes marques"],
+        priceRange: "$",
+        rating: 4.2,
+        reviews: 98,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.5731, lng: -7.6398 }
+    },
+    {
+        id: "cas_006",
+        name: "Casa Car Repair",
+        city: "Casablanca",
+        address: "Ain Sebaa, Casablanca",
+        phone: "+212 522-678-901",
+        services: ["Tôlerie", "Peinture", "Carrosserie", "Réparation"],
+        specializations: ["Spécialiste carrosserie"],
+        priceRange: "$$",
+        rating: 4.3,
+        reviews: 87,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.6131, lng: -7.5198 }
+    },
+
+    // Rabat
+    {
+        id: "rab_001",
+        name: "Les Ateliers Ben's",
+        city: "Rabat",
+        address: "Avenue Allal Ben Abdellah, Rabat",
+        phone: "+212 537-123-456",
+        services: ["Mécanique", "Vidange", "Révision", "Freins", "Diagnostic", "Entretien"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.7,
+        reviews: 167,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 34.0209, lng: -6.8416 }
+    },
+    {
+        id: "rab_002",
+        name: "Auto Garage Services Rabat",
+        city: "Rabat",
+        address: "Hay Riad, Rabat",
+        phone: "+212 537-234-567",
+        services: ["Entretien", "Mécanique", "Vidange", "Révision", "Diagnostic"],
+        specializations: ["Multi-marque"],
+        priceRange: "$",
+        rating: 4.3,
+        reviews: 92,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.9716, lng: -6.8498 }
+    },
+    {
+        id: "rab_003",
+        name: "RABAT DIAGNOSTIC (Euro Repar)",
+        city: "Rabat",
+        address: "Avenue Mohammed V, Rabat",
+        phone: "+212 537-345-678",
+        services: ["Diagnostic", "Vidange", "Révision", "Pneumatique", "Climatisation", "Freinage"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.6,
+        reviews: 143,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 34.0209, lng: -6.8316 }
+    },
+    {
+        id: "rab_004",
+        name: "SPEEDY Rabat",
+        city: "Rabat",
+        address: "Avenue des FAR, Rabat",
+        phone: "+212 537-456-789",
+        services: ["Vidange", "Révision", "Pneus", "Freins", "Échappement", "Amortisseurs"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.5,
+        reviews: 178,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 34.0209, lng: -6.8216 }
+    },
+    {
+        id: "rab_005",
+        name: "Fast Pro Rabat",
+        city: "Rabat",
+        address: "Agdal, Rabat",
+        phone: "+212 537-567-890",
+        services: ["Vidange", "Révision", "Entretien", "Diagnostic"],
+        specializations: ["Dacia", "Renault", "Nissan"],
+        priceRange: "$",
+        rating: 4.4,
+        reviews: 125,
+        email: "contact@provider.ma",
+        website: "https://www.provider.ma",
+        coordinates: { lat: 33.9916, lng: -6.8598 }
+    },
+
+    // Tanger (Mock Data for Testing)
+    {
+        id: "tng_001",
+        name: "Tanger Auto Center",
+        city: "Tanger",
+        address: "Zone Franche, Tanger",
+        phone: "+212 539-123-456",
+        services: ["Vidange", "Mécanique", "Diagnostic", "Climatisation", "Freins"],
+        specializations: ["Toutes marques"],
+        priceRange: "$$",
+        rating: 4.8,
+        reviews: 89,
+        email: "contact@tangerauto.ma",
+        website: "https://www.tangerauto.ma",
+        coordinates: { lat: 35.7595, lng: -5.8340 }
+    },
+    {
+        id: "tng_002",
+        name: "Garage du Nord",
+        city: "Tanger",
+        address: "Avenue des FAR, Tanger",
+        phone: "+212 539-987-654",
+        services: ["Carrosserie", "Peinture", "Tôlerie", "Pare-brise"],
+        specializations: ["Sinistres", "Assurances"],
+        priceRange: "$$",
+        rating: 4.4,
+        reviews: 56,
+        email: "info@garagedunord.ma",
+        website: "https://www.garagedunord.ma",
+        coordinates: { lat: 35.7721, lng: -5.8012 }
+    },
+    {
+        id: "tng_003",
+        name: "Speedy Tanger",
+        city: "Tanger",
+        address: "Route de Rabat, Tanger",
+        phone: "+212 539-456-789",
+        services: ["Vidange", "Pneus", "Freins", "Amortisseurs", "Batterie"],
+        specializations: ["Service rapide"],
+        priceRange: "$",
+        rating: 4.5,
+        reviews: 120,
+        email: "tanger@speedy.ma",
+        website: "https://www.speedy.ma",
+        coordinates: { lat: 35.7412, lng: -5.8123 }
+    },
+    {
+        id: "tng_004",
+        name: "Mécano Express Tanger",
+        city: "Tanger",
+        address: "Quartier Malabata, Tanger",
+        phone: "+212 661-234-567",
+        services: ["Dépannage", "Mécanique", "Vidange", "Diagnostic"],
+        specializations: ["Intervention à domicile"],
+        priceRange: "$$$",
+        rating: 4.9,
+        reviews: 210,
+        email: "contact@mecanoexpress.ma",
+        website: "https://www.mecanoexpress.ma",
+        coordinates: { lat: 35.7834, lng: -5.7912 }
+    }
+];
+
+// Price estimates for common services (in MAD)
+const SERVICE_PRICES = {
+    "Vidange": { min: 299, max: 800, avg: 450 },
+    "Révision": { min: 495, max: 1500, avg: 800 },
+    "Freins": { min: 400, max: 1200, avg: 700 },
+    "Pneus": { min: 300, max: 1500, avg: 800 },
+    "Climatisation": { min: 500, max: 1200, avg: 800 },
+    "Diagnostic": { min: 200, max: 500, avg: 300 },
+    "Carrosserie": { min: 1000, max: 5000, avg: 2500 },
+    "Peinture": { min: 1500, max: 6000, avg: 3000 },
+    "Amortisseurs": { min: 600, max: 1800, avg: 1000 },
+    "Échappement": { min: 500, max: 1500, avg: 900 }
+};
+
+window.MoroccanCities = MOROCCAN_CITIES;
+window.ServiceProviders = SERVICE_PROVIDERS;
+window.ServicePrices = SERVICE_PRICES;

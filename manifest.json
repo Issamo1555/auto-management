@@ -1,7 +1,7 @@
 {
   "name": "AutoManager - Gestion Véhicules",
   "short_name": "AutoManager",
-  "description": "Application de gestion de véhicules, documents et entretiens",
+  "description": "Application de gestion de véhicules avec assistant vocal et scanner QR",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0f172a",

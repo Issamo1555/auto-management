@@ -1,4 +1,44 @@
+# Dependencies
 node_modules/
+package-lock.json
+
+# System Files
 .DS_Store
 *.log
+Thumbs.db
+
+# Environment
 .env
+.env.local
+
+# Archives et backups
+*.zip
+*.tar.gz
+*.rar
+
+# macOS
+.AppleDouble
+.LSOverride
+._*
+*.webarchive
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary
+*.tmp
+*.temp
+.cache/
+
+# Build artifacts
+dist/
+build/
+
+# Scripts temporaires
+convert_to_pdf.py
+
+# Dossier legacy
+automanager/

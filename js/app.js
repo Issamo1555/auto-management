@@ -26,11 +26,66 @@ class App {
             window.UIManager.init();
         }
 
+        // Initialize Voice Assistant and QR Scanner
+        this.setupVoiceAssistant();
+        this.setupQRScanner();
+
         // Apply Theme
         if (window.SettingsManager) {
             const settings = window.SettingsManager.getSettings();
             window.SettingsManager.applyTheme(settings.theme);
         }
+    }
+
+    /**
+     * Setup Voice Assistant
+     */
+    setupVoiceAssistant() {
+        const voiceBtn = document.getElementById('voice-assistant-btn');
+        const voiceModal = document.getElementById('voice-assistant-modal');
+
+        if (!voiceBtn || !voiceModal) return;
+
+        // Check if voice assistant is supported
+        if (!window.VoiceAssistant || !window.VoiceAssistant.isSupported) {
+            voiceBtn.style.display = 'none';
+            return;
+        }
+
+        // Open modal on button click
+        voiceBtn.addEventListener('click', () => {
+            voiceModal.classList.remove('hidden');
+        });
+
+        // Close modal on overlay click
+        voiceModal.addEventListener('click', (e) => {
+            if (e.target === voiceModal) {
+                window.VoiceAssistant.stopListening();
+                voiceModal.classList.add('hidden');
+            }
+        });
+    }
+
+    /**
+     * Setup QR Scanner
+     */
+    setupQRScanner() {
+        const qrBtn = document.getElementById('qr-scanner-btn');
+        const qrModal = document.getElementById('qr-scanner-modal');
+
+        if (!qrBtn || !qrModal) return;
+
+        // Open modal on button click
+        qrBtn.addEventListener('click', () => {
+            window.QRScanner.openModal();
+        });
+
+        // Close modal on overlay click
+        qrModal.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                window.QRScanner.closeModal();
+            }
+        });
     }
 
     showAuthScreen() {
@@ -241,6 +296,24 @@ class App {
             return;
         }
 
+        if (viewName === 'car-advisor') {
+            if (window.CarAdvisor) {
+                window.CarAdvisor.renderView(container);
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Conseiller d\'Achat non chargé.</p>';
+            }
+            return;
+        }
+
+        if (viewName === 'providers') {
+            if (window.ProviderUIManager) {
+                window.ProviderUIManager.init(container);
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Fournisseurs non chargé.</p>';
+            }
+            return;
+        }
+
         // Fallback
         container.innerHTML = `
     < div class="welcome-card" >
@@ -254,10 +327,12 @@ class App {
 // Initialize App when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new App();
-    // Initialize notifications after a short delay to ensure all modules are loaded
+
+    // Initialize notifications and provider search after a short delay to ensure all modules are loaded
     setTimeout(() => {
         if (window.NotificationManager) {
             window.NotificationManager.init();
         }
+
     }, 1000);
 });

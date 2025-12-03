@@ -28,6 +28,9 @@ class DashboardManager {
         const settings = window.SettingsManager ? window.SettingsManager.getSettings() : { userName: 'Propriétaire' };
         const userName = settings.userName || 'Propriétaire';
 
+        // Calculate Upcoming Maintenance
+        const upcomingMaintenance = this._getUpcomingMaintenance(vehicles, maintenance);
+
         const html = `
             <div class="dashboard-grid">
                 <!-- Welcome Section -->
@@ -61,6 +64,12 @@ class DashboardManager {
                     </div>
                 </div>
 
+                <!-- Upcoming Maintenance Section -->
+                <div class="section-title">Prochains Entretiens (Estimations)</div>
+                <div class="upcoming-list">
+                    ${this._renderUpcomingMaintenance(upcomingMaintenance)}
+                </div>
+
                 <!-- Statistics Charts -->
                 <div class="section-title">Statistiques Détaillées</div>
                 <div class="charts-row">
@@ -71,9 +80,9 @@ class DashboardManager {
                         </div>
                     </div>
                     <div class="chart-container">
-                        <h4>Répartition par type</h4>
+                        <h4>Coût par Véhicule</h4>
                         <div class="chart-wrapper">
-                            <canvas id="chart-cost-type"></canvas>
+                            <canvas id="chart-cost-vehicle"></canvas>
                         </div>
                     </div>
                 </div>
@@ -94,11 +103,68 @@ class DashboardManager {
                 document.getElementById('chart-cost-time'),
                 maintenance
             );
-            window.ChartsManager.renderCostByType(
-                document.getElementById('chart-cost-type'),
-                maintenance
+            window.ChartsManager.renderCostByVehicle(
+                document.getElementById('chart-cost-vehicle'),
+                maintenance,
+                vehicles
             );
         }
+    }
+
+    _getUpcomingMaintenance(vehicles, maintenance) {
+        const upcoming = [];
+        const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;
+
+        vehicles.forEach(vehicle => {
+            // Find last maintenance
+            const vehicleMaint = maintenance.filter(m => m.vehicleId === vehicle.id);
+            if (vehicleMaint.length === 0) return;
+
+            // Sort by date descending
+            vehicleMaint.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const lastMaint = vehicleMaint[0];
+            const lastDate = new Date(lastMaint.date);
+
+            // Estimate next date (1 year later)
+            const nextDate = new Date(lastDate.getTime() + ONE_YEAR_MS);
+            const daysUntil = Math.ceil((nextDate - new Date()) / (1000 * 60 * 60 * 24));
+
+            if (daysUntil > 0 && daysUntil < 60) { // Show if due within 60 days
+                upcoming.push({
+                    vehicle: `${vehicle.make} ${vehicle.model}`,
+                    date: nextDate,
+                    days: daysUntil,
+                    type: 'Révision annuelle'
+                });
+            }
+        });
+
+        return upcoming.sort((a, b) => a.days - b.days);
+    }
+
+    _renderUpcomingMaintenance(upcoming) {
+        if (upcoming.length === 0) {
+            return `
+                <div class="empty-state small" style="padding: 1rem;">
+                    <p>Aucun entretien prévu prochainement.</p>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="upcoming-grid">
+                ${upcoming.map(item => `
+                    <div class="upcoming-card">
+                        <div class="upcoming-icon">🔧</div>
+                        <div class="upcoming-info">
+                            <div class="upcoming-title">${item.vehicle}</div>
+                            <div class="upcoming-desc">${item.type} - Dans ${item.days} jours</div>
+                        </div>
+                        <div class="upcoming-date">${item.date.toLocaleDateString()}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 
     _renderNotifications(documents) {

@@ -64,6 +64,40 @@ class MaintenanceManager {
     }
 
     // --- UI Generation Methods ---
+    /**
+     * Predict upcoming maintenance tasks for a vehicle based on last records and standard intervals.
+     * Returns an array of objects: { type, dueDate, mileageDue }
+     */
+    predictUpcoming(vehicleId) {
+        const records = this.getByVehicle(vehicleId);
+        if (records.length === 0) return [];
+        const intervals = {
+            'Vidange': 10000,
+            'Freins': 20000,
+            'Pneus': 30000,
+            'Filtres': 15000,
+            'Révision': 12000,
+            'Batterie': 40000,
+            'Réparation': 0,
+            'Autre': 0
+        };
+        const predictions = [];
+        for (const [type, kmInterval] of Object.entries(intervals)) {
+            if (kmInterval <= 0) continue;
+            const recent = records.find(r => r.type === type);
+            if (!recent) continue;
+            const lastMileage = parseInt(recent.mileage || 0);
+            const nextMileage = lastMileage + kmInterval;
+            const dueDate = new Date(recent.date);
+            dueDate.setMonth(dueDate.getMonth() + 6);
+            predictions.push({
+                type,
+                dueDate: dueDate.toISOString().split('T')[0],
+                mileageDue: nextMileage
+            });
+        }
+        return predictions;
+    }
 
     renderView(container) {
         const vehicles = window.VehicleManager ? window.VehicleManager.getAll() : [];
@@ -97,6 +131,9 @@ class MaintenanceManager {
 
             <div id="maintenance-stats" class="stats-container">
                 <!-- Stats injected here -->
+            </div>
+            <div id="maintenance-predictions" class="predictions-container">
+                <!-- Predictions will be rendered here -->
             </div>
 
             <div id="maintenance-list-container">
@@ -145,7 +182,12 @@ class MaintenanceManager {
 
                         <div class="form-group">
                             <label>Garage / Prestataire</label>
-                            <input type="text" name="provider" placeholder="ex: Garage du Centre">
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" name="provider" placeholder="ex: Garage du Centre" style="flex:1">
+                                <button type="button" class="btn btn-secondary" id="btn-find-provider" style="white-space:nowrap;">
+                                    🔍 Trouver un Fournisseur
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-actions">
@@ -184,6 +226,23 @@ class MaintenanceManager {
                 <span class="stat-value">${records.length}</span>
             </div>
         `;
+        // Render predictions
+        const predictions = this.predictUpcoming(vehicleId);
+        const predContainer = container.querySelector('#maintenance-predictions');
+        if (predictions.length === 0) {
+            predContainer.innerHTML = `<div class="empty-state small"><p>Aucune maintenance prévue.</p></div>`;
+        } else {
+            predContainer.innerHTML = `
+                <div class="predictions-header"><h4>Prochaines maintenances</h4></div>
+                <ul class="predictions-list">
+                    ${predictions.map(p => `
+                        <li class="prediction-item">
+                            <span class="prediction-type">${p.type}</span>
+                            <span class="prediction-due">${p.dueDate}</span>
+                            <span class="prediction-mileage">${p.mileageDue.toLocaleString()} km</span>
+                        </li>`).join('')}
+                </ul>`;
+        }
 
         if (records.length === 0) {
             listContainer.innerHTML = `
@@ -265,6 +324,21 @@ class MaintenanceManager {
 
             modal.classList.remove('hidden');
         });
+
+        // Find Provider button
+        const btnFindProvider = container.querySelector('#btn-find-provider');
+        if (btnFindProvider && window.ProviderSearchManager) {
+            btnFindProvider.addEventListener('click', () => {
+                const vehicleId = selector.value;
+                const vehicle = window.VehicleManager?.getAll().find(v => v.id === vehicleId);
+                const serviceType = typeSelect?.value;
+
+                window.ProviderSearchManager.openSearchModal({
+                    serviceType: serviceType !== 'Autre' ? serviceType : '',
+                    vehicleBrand: vehicle?.make || ''
+                });
+            });
+        }
 
         closeButtons.forEach(btn => {
             btn.addEventListener('click', () => {

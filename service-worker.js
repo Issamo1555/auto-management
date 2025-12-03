@@ -1,4 +1,4 @@
-const CACHE_NAME = 'automanager-v1.2';
+const CACHE_NAME = 'automanager-v1.6';
 const urlsToCache = [
     './',
     './index.html',
@@ -13,7 +13,10 @@ const urlsToCache = [
     './js/notification.js',
     './js/charts.js',
     './js/utils.js',
-    './js/car_data.js'
+    './js/car_data.js',
+    './js/provider_data.js',
+    './js/ai_service.js',
+    './js/provider_search.js'
 ];
 
 // Install event - cache files

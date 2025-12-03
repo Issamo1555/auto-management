@@ -137,6 +137,13 @@ class VehicleManager {
             </div>`;
         container.innerHTML = html + detailsModal;
         this._attachEvents(container);
+
+        // Add comparison checkboxes after DOM is fully updated
+        setTimeout(() => {
+            if (window.VehicleComparator) {
+                window.VehicleComparator.addCompareCheckboxes();
+            }
+        }, 100);
     }
 
     _renderVehicleList(vehicles) {
@@ -150,10 +157,10 @@ class VehicleManager {
             `;
         }
 
-        return `
+        const html = `
             <div class="vehicle-grid">
                 ${vehicles.map(v => `
-                    <div class="vehicle-card">
+                    <div class="vehicle-card" data-vehicle-id="${v.id}">
                         <div class="vehicle-photo-placeholder">
                             ${v.photo ? `<img src="${v.photo}" class="vehicle-photo-img" alt="${v.make}">` : this._getVehicleIcon(v.vehicleType || 'car')}
                         </div>
@@ -181,6 +188,8 @@ class VehicleManager {
                 `).join('')}
             </div>
         `;
+
+        return html;
     }
 
     _attachEvents(container) {

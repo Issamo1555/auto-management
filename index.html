@@ -14,7 +14,8 @@
     <meta name="apple-mobile-web-app-title" content="AutoManager">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css?v=1.3">
+    <link rel="stylesheet" href="css/comparator.css?v=1.0">
     <!-- Google Fonts: Inter for a premium feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,18 +23,22 @@
 
     <!-- Chart.js for statistics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- html5-qrcode for QR scanning -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <!-- QRCode.js for QR generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registered:', registration);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed:', error);
-                    });
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log('Service Worker unregistered');
+                }
             });
         }
     </script>
@@ -55,7 +60,13 @@
                     <span class="icon">▶</span> Véhicules
                 </li>
                 <li data-view="documents">
-                    <span class="icon">▣</span> Documents
+                    <span class="icon">📄</span> Documents
+                </li>
+                <li data-view="providers">
+                    <span class="icon">🔧</span> Fournisseurs
+                </li>
+                <li data-view="car-advisor">
+                    <span class="icon">💡</span> Conseiller d'Achat
                 </li>
                 <li data-view="maintenance">
                     <span class="icon">⚒</span> Entretien
@@ -76,6 +87,14 @@
                 </div>
                 <h2 id="page-title">Tableau de bord</h2>
                 <div class="user-profile">
+                    <button id="voice-assistant-btn" class="btn-icon" title="Assistant Vocal">
+                        🎤
+                        <span class="status-badge" style="display: none;"></span>
+                    </button>
+                    <button id="qr-scanner-btn" class="btn-icon" title="Scanner QR Code">
+                        📱
+                        <span class="status-badge" style="display: none;"></span>
+                    </button>
                     <button id="theme-toggle" class="btn-icon" title="Changer de thème">🌓</button>
                     <span class="notification-badge" id="notification-bell">◉</span>
                     <div class="avatar" id="user-avatar">U</div>
@@ -93,6 +112,13 @@
                 </div>
             </div>
 
+            <div id="view-documents" class="view-section hidden">
+                <!-- Documents Module -->
+            </div>
+
+            <div id="view-providers" class="view-section hidden">
+                <!-- Providers Module -->
+            </div>
             <!-- User Menu -->
             <div id="user-menu" class="dropdown-panel hidden">
                 <div class="panel-header">
@@ -181,21 +207,250 @@
         </div>
     </div>
 
+    <!-- Provider Search Modal -->
+    <div id="modal-provider-search" class="modal hidden">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-header">
+                <h4>🔍 Trouver un Fournisseur</h4>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="form-provider-search">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ville</label>
+                        <select id="provider-city" required class="form-select">
+                            <option value="">Sélectionner une ville</option>
+                            <option value="Marrakech">Marrakech</option>
+                            <option value="Casablanca">Casablanca</option>
+                            <option value="Rabat">Rabat</option>
+                            <option value="Fès">Fès</option>
+                            <option value="Tanger">Tanger</option>
+                            <option value="Agadir">Agadir</option>
+                            <option value="Meknès">Meknès</option>
+                            <option value="Oujda">Oujda</option>
+                            <option value="Kénitra">Kénitra</option>
+                            <option value="Tétouan">Tétouan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type de service</label>
+                        <select id="provider-service-type" required class="form-select">
+                            <option value="">Sélectionner un service</option>
+                            <option value="Vidange">Vidange</option>
+                            <option value="Révision">Révision</option>
+                            <option value="Freins">Freins</option>
+                            <option value="Pneus">Pneus</option>
+                            <option value="Climatisation">Climatisation</option>
+                            <option value="Diagnostic">Diagnostic</option>
+                            <option value="Carrosserie">Carrosserie</option>
+                            <option value="Peinture">Peinture</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marque du véhicule (optionnel)</label>
+                        <input type="text" id="provider-vehicle-brand" placeholder="ex: Renault">
+                    </div>
+                    <div class="form-group">
+                        <label>Budget (optionnel)</label>
+                        <select id="provider-price-range" class="form-select">
+                            <option value="">Tous</option>
+                            <option value="$">💵 Économique</option>
+                            <option value="$$">💵💵 Moyen</option>
+                            <option value="$$$">💵💵💵 Premium</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="btn-search-providers" class="btn btn-primary">
+                        🤖 Rechercher avec IA
+                    </button>
+                </div>
+            </form>
+            <div id="provider-results" style="margin-top:1.5rem;">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Assistant Modal -->
+    <div id="voice-assistant-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h4>🎤 Assistant Vocal</h4>
+                <span class="close-modal"
+                    onclick="window.VoiceAssistant.stopListening(); this.closest('.modal').classList.add('hidden');">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="voice-assistant-container">
+                    <div class="voice-indicator idle"></div>
+                    <p class="voice-status">🎤 Prêt à écouter</p>
+                    <p class="voice-transcript" style="display: none;"></p>
+                    <p class="voice-response" style="display: none;"></p>
+                    <div class="form-actions" style="margin-top: 1.5rem;">
+                        <button class="btn btn-primary" onclick="window.VoiceAssistant.startListening()">🎤
+                            Commencer</button>
+                        <button class="btn btn-secondary" onclick="window.VoiceAssistant.stopListening()">⏹️
+                            Arrêter</button>
+                    </div>
+                    <div class="voice-help" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        <p><strong>Exemples de commandes :</strong></p>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li>• "Ouvrir véhicules"</li>
+                            <li>• "Combien de véhicules"</li>
+                            <li>• "Prochain entretien"</li>
+                            <li>• "Arrêter"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h4>📱 Scanner QR Code</h4>
+                <span class="close-modal" onclick="window.QRScanner.closeModal();">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="qr-tabs">
+                    <button class="qr-tab-btn active" data-tab="scan" onclick="window.QRScanner.switchTab('scan')">
+                        🔍 Scanner
+                    </button>
+                    <button class="qr-tab-btn" data-tab="generate" onclick="window.QRScanner.switchTab('generate')">
+                        ✨ Générer
+                    </button>
+                </div>
+
+                <!-- Scanner Tab -->
+                <div id="qr-scan-tab" class="qr-tab-content">
+                    <p class="scanner-status">📷 Prêt à scanner</p>
+                    <div id="qr-reader" style="width: 100%; margin: 1rem 0;"></div>
+                    <div class="qr-result" style="display: none;"></div>
+                    <div class="form-actions">
+                        <button class="btn btn-secondary" onclick="window.QRScanner.closeModal()">Fermer</button>
+                        <button class="btn btn-primary" onclick="window.QRScanner.startScanning()">
+                            📷 Démarrer Scanner
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.QRScanner.switchCamera()"
+                            id="switch-camera-btn" style="display: none;">
+                            🔄 Changer Caméra
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generate Tab -->
+                <div id="qr-generate-tab" class="qr-tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label>Sélectionner un véhicule</label>
+                        <select id="vehicle-select-qr" class="form-select">
+                            <option value="">Sélectionner un véhicule</option>
+                        </select>
+                    </div>
+                    <div id="qr-code-display" style="text-align: center; margin: 1.5rem 0; min-height: 256px;"></div>
+                    <div class="form-actions">
+                        <button class="btn btn-secondary" onclick="window.QRScanner.closeModal()">Fermer</button>
+                        <button class="btn btn-primary"
+                            onclick="const vehicleId = document.getElementById('vehicle-select-qr').value; if(vehicleId) window.QRScanner.generateVehicleQR(vehicleId); else alert('Sélectionnez un véhicule');">
+                            ✨ Générer QR Code
+                        </button>
+                        <button class="btn btn-secondary" id="download-qr-btn" style="display: none;">
+                            💾 Télécharger
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Car Advisor Modal -->
+    <div id="modal-car-advisor" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h4>💡 Conseiller d'Achat</h4>
+                <span class="close-modal" id="close-advisor-modal"
+                    onclick="document.getElementById('modal-car-advisor').classList.add('hidden')">&times;</span>
+            </div>
+
+            <div class="advisor-container" style="flex: 1; overflow-y: auto; padding: 0;">
+                <!-- Progress Bar -->
+                <div class="advisor-progress">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="advisor-progress-fill" style="width: 25%;"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="step active" data-step="1">1. Budget</div>
+                        <div class="step" data-step="2">2. Usage</div>
+                        <div class="step" data-step="3">3. Tech</div>
+                        <div class="step" data-step="4">4. Préférences</div>
+                    </div>
+                </div>
+
+                <!-- Wizard Content -->
+                <div class="advisor-content" id="advisor-content">
+                    <!-- Steps will be injected here by JS -->
+                </div>
+            </div>
+
+            <div class="modal-footer"
+                style="padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                <button id="btn-advisor-prev" class="btn btn-secondary" disabled>Précédent</button>
+                <button id="btn-advisor-next" class="btn btn-primary">Suivant</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Comparator Modal -->
+    <div id="modal-comparator" class="modal hidden">
+        <div class="modal-content" style="max-width: 95vw; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h4>⚖️ Comparateur de Véhicules</h4>
+                <span class="close-modal"
+                    onclick="document.getElementById('modal-comparator').classList.add('hidden')">&times;</span>
+            </div>
+            <div class="modal-body" style="flex: 1; overflow: auto; padding: 0;">
+                <div id="comparator-content" class="comparator-container">
+                    <!-- Comparison table will be injected here -->
+                </div>
+            </div>
+            <div class="modal-footer"
+                style="padding: 1rem; border-top: 1px solid var(--border-color); text-align: right;">
+                <button class="btn btn-secondary"
+                    onclick="document.getElementById('modal-comparator').classList.add('hidden')">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="js/utils.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/config.js?v=1.4.0"></script>
+    <script src="js/utils.js?v=1.4.0"></script>
+    <script src="js/auth.js?v=1.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/car_data.js"></script>
-    <script src="js/vehicle.js"></script>
-    <script src="js/document.js"></script>
-    <script src="js/maintenance.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/notification.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/charts.js?v=1.4.0"></script>
+    <script src="js/storage.js?v=1.4.0"></script>
+    <script src="js/car_data.js?v=1.4.0"></script>
+    <script src="js/provider_data.js?v=1.4.0"></script>
+    <script src="js/provider_manager.js?v=1.4.0"></script>
+    <script src="js/provider_ui.js?v=1.4.0"></script>
+    <script src="js/ai_service.js?v=1.6.0"></script>
+    <script src="js/provider_search.js?v=1.4.0"></script>
+    <script src="js/vehicles_database.js?v=1.5.0"></script>
+    <script src="js/car_advisor.js?v=1.5.0"></script>
+    <script src="js/voice_assistant.js?v=1.5.0"></script>
+    <script src="js/qr_scanner.js?v=1.5.0"></script>
+    <script src="js/comparator.js?v=1.0"></script>
+    <script src="js/vehicle.js?v=1.4.0"></script>
+    <script src="js/document.js?v=1.4.0"></script>
+    <script src="js/maintenance.js?v=1.4.0"></script>
+    <script src="js/dashboard.js?v=1.4.0"></script>
+    <script src="js/notification.js?v=1.4.0"></script>
+    <script src="js/settings.js?v=1.4.0"></script>
+    <script src="js/ui.js?v=1.4.0"></script>
+    <script src="js/app.js?v=1.4.0"></script>
 </body>
 
 </html>

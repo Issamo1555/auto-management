@@ -191,6 +191,73 @@ class ChartsManager {
             }
         });
     }
+
+    /**
+     * Render a bar chart showing cost distribution by vehicle.
+     * @param {HTMLCanvasElement} canvas - The canvas element to render into.
+     * @param {Array} records - Array of maintenance records.
+     * @param {Array} vehicles - Array of vehicle objects.
+     */
+    static renderCostByVehicle(canvas, records, vehicles) {
+        if (!canvas || !records || records.length === 0 || !vehicles || vehicles.length === 0) {
+            canvas.parentElement.innerHTML = '<div class="empty-chart"><p>📊 Aucune donnée</p><p class="sub-text">Ajoutez des véhicules et des entretiens</p></div>';
+            return;
+        }
+
+        const vehicleMap = {};
+        vehicles.forEach(v => {
+            vehicleMap[v.id] = { name: `${v.make} ${v.model}`, cost: 0 };
+        });
+
+        records.forEach(rec => {
+            if (vehicleMap[rec.vehicleId]) {
+                vehicleMap[rec.vehicleId].cost += parseFloat(rec.cost) || 0;
+            }
+        });
+
+        const labels = Object.values(vehicleMap).map(v => v.name);
+        const data = Object.values(vehicleMap).map(v => v.cost);
+
+        new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Coût Total',
+                    data,
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: 6,
+                    barThickness: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        callbacks: {
+                            label: (context) => `Coût: ${context.parsed.y.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: {
+                            callback: (value) => value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Export to global namespace for easy access from dashboard.js
