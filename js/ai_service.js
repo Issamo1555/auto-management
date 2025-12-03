@@ -1,17 +1,14 @@
 /**
  * AI Service for Provider Recommendations
- * Uses Google Gemini API for intelligent provider matching
+ * Uses OpenAI GPT-4 API for intelligent recommendations
  */
 
 class AIService {
     constructor() {
-        // Using Google Gemini API (free tier)
-        // Note: In production, API key should be stored securely on backend
-        // Using Google Gemini API
-        // Note: In production, API key should be stored securely on backend
+        // OpenAI API Configuration
         const settings = window.SettingsManager ? window.SettingsManager.getSettings() : {};
-        this.GEMINI_API_KEY = window.AppConfig?.GEMINI_API_KEY || settings.geminiApiKey || 'AIzaSyBonWFiLUsJSjuN59tytqC7dyRx5FmdPLs';
-        this.GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        this.OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || settings.openaiApiKey || '';
+        this.OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
         this.cache = new Map();
         this.CACHE_DURATION = 1000 * 60 * 30; // 30 minutes
     }
@@ -66,7 +63,7 @@ class AIService {
     }
 
     /**
-     * Get AI-powered recommendations using Google Gemini
+     * Get AI-powered recommendations using OpenAI GPT-4
      */
     async _getAIRecommendations(params) {
         const { city, serviceType, vehicleBrand, priceRange } = params;
@@ -79,37 +76,44 @@ class AIService {
             throw new Error(`No providers found in ${city}`);
         }
 
-        // Create prompt for Gemini
+        // Create prompt for OpenAI
         const prompt = this._createPrompt(params, cityProviders);
 
         // Create AbortController for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
         try {
-            // Call Gemini API
-            const response = await fetch(`${this.GEMINI_API_URL}?key=${this.GEMINI_API_KEY}`, {
+            // Call OpenAI API
+            const response = await fetch(this.OPENAI_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.OPENAI_API_KEY}`
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
+                    model: "gpt-4o-mini", // Fast and cost-effective
+                    messages: [{
+                        role: "system",
+                        content: "Tu es un expert en recommandation de garages automobiles au Maroc. Tu donnes des conseils précis et pertinents."
+                    }, {
+                        role: "user",
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 500
                 }),
                 signal: controller.signal
             });
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-                throw new Error(`Gemini API error: ${response.status}`);
+                const error = await response.json();
+                throw new Error(`OpenAI API error: ${error.error?.message || response.status}`);
             }
 
             const data = await response.json();
-            const aiResponse = data.candidates[0].content.parts[0].text;
+            const aiResponse = data.choices[0].message.content;
 
             // Parse AI response to get provider IDs
             const recommendedIds = this._parseAIResponse(aiResponse);
@@ -128,7 +132,7 @@ class AIService {
     }
 
     /**
-     * Create prompt for Gemini AI
+     * Create prompt for OpenAI
      */
     _createPrompt(params, providers) {
         const { city, serviceType, vehicleBrand, priceRange } = params;
@@ -285,40 +289,35 @@ Donne UNIQUEMENT les 3 meilleures recommandations.`;
     }
 
     /**
-     * Get personalized car buying advice
-     */
-    /**
-     * Get personalized car buying advice using Mistral AI
+     * Get personalized car buying advice using OpenAI GPT-4
      */
     async getCarAdvice(userNeeds, topCars) {
-        console.log('🤖 AIService: getCarAdvice called (Mistral)', userNeeds);
+        console.log('🤖 AIService: getCarAdvice called (OpenAI GPT-4)', userNeeds);
 
-        const prompt = `
-            Tu es un expert automobile au Maroc.
-            
-            Un utilisateur cherche une voiture avec ces critères :
-            - Budget: ${userNeeds.budget} DH
-            - Usage: ${userNeeds.usage}
-            - Type: ${userNeeds.type_achat}
-            - Kilométrage annuel: ${userNeeds.km_annuel}
-            - Préférences: ${userNeeds.marques.join(', ')}
-            
-            Voici les voitures recommandées par notre algorithme :
-            ${topCars.map(c => `- ${c.marque} ${c.modele} (${c.match}% match)`).join('\n')}
-            
-            Donne un conseil personnalisé en 3-4 phrases. 
-            Explique pourquoi la première recommandation est bonne pour son usage spécifique.
-            Mentionne un point de vigilance si c'est une occasion.
-            
-            Réponse courte et directe.
-        `;
+        const prompt = `Tu es un expert automobile au Maroc.
+
+Un utilisateur cherche une voiture avec ces critères :
+- Budget: ${userNeeds.budget} DH
+- Usage: ${userNeeds.usage}
+- Type: ${userNeeds.type_achat}
+- Kilométrage annuel: ${userNeeds.km_annuel}
+- Préférences: ${userNeeds.marques.join(', ')}
+
+Voici les voitures recommandées par notre algorithme :
+${topCars.map(c => `- ${c.marque} ${c.modele} (${c.match}% match)`).join('\n')}
+
+Donne un conseil personnalisé en 3-4 phrases. 
+Explique pourquoi la première recommandation est bonne pour son usage spécifique.
+Mentionne un point de vigilance si c'est une occasion.
+
+Réponse courte et directe.`;
 
         // Check for API Key
-        const apiKey = window.AppConfig?.MISTRAL_API_KEY || '';
+        const apiKey = this.OPENAI_API_KEY;
 
-        // Simulation Mode if no key or default key
-        if (!apiKey || apiKey === 'YOUR_MISTRAL_API_KEY') {
-            console.warn('⚠️ No Mistral API Key found. Using Simulation Mode.');
+        // Simulation Mode if no key
+        if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY' || apiKey === '') {
+            console.warn('⚠️ No OpenAI API Key found. Using Simulation Mode.');
             return new Promise(resolve => {
                 setTimeout(() => {
                     resolve(`[MODE SIMULATION] D'après vos critères (${userNeeds.usage}, budget ${userNeeds.budget} DH), la ${topCars[0].marque} ${topCars[0].modele} est un excellent choix. Elle offre le meilleur compromis pour un usage ${userNeeds.usage}. En occasion, vérifiez bien l'historique d'entretien et l'état de la courroie de distribution.`);
@@ -327,31 +326,36 @@ Donne UNIQUEMENT les 3 meilleures recommandations.`;
         }
 
         try {
-            const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            const response = await fetch(this.OPENAI_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: "mistral-tiny",
-                    messages: [
-                        { role: "user", content: prompt }
-                    ],
-                    max_tokens: 150
+                    model: "gpt-4o-mini",
+                    messages: [{
+                        role: "system",
+                        content: "Tu es un expert automobile au Maroc. Tu donnes des conseils précis et adaptés au marché marocain."
+                    }, {
+                        role: "user",
+                        content: prompt
+                    }],
+                    temperature: 0.7,
+                    max_tokens: 200
                 })
             });
 
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.message || 'Mistral API error');
+                const error = await response.json();
+                throw new Error(error.error?.message || 'OpenAI API error');
             }
 
             const data = await response.json();
             return data.choices[0].message.content;
         } catch (error) {
             console.error('AI Advice failed', error);
-            return "L'assistant IA n'est pas disponible pour le moment. Vérifiez votre clé API Mistral.";
+            return "L'assistant IA n'est pas disponible pour le moment. Vérifiez votre clé API OpenAI.";
         }
     }
 }
