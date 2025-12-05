@@ -28,6 +28,12 @@
     <!-- html5-qrcode for QR scanning -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+    <!-- Leaflet.js for OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <!-- QRCode.js for QR generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -67,6 +73,9 @@
                 </li>
                 <li data-view="best-route">
                     <span class="icon">🗺️</span> Meilleur trajet
+                </li>
+                <li data-view="public-transport">
+                    <span class="icon">🚌</span> Transports
                 </li>
                 <li data-view="parking">
                     <span class="icon">🅿️</span> Parking Marrakech
@@ -542,16 +551,59 @@
             </div>
         </div>
     </div>
+
+    <!-- Public Transport Modal -->
+    <div id="modal-public-transport" class="modal hidden">
+        <div class="modal-content" style="max-width: 95vw; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h4>🚌 Transports en Commun - Marrakech</h4>
+                <span class="close-modal" onclick="window.PublicTransportManager.closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="flex: 1; overflow: hidden; display: flex; gap: 1rem; padding: 0;">
+                <!-- Left Panel: Lines List & Details -->
+                <div
+                    style="width: 350px; padding: 1.5rem; overflow-y: auto; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
+
+                    <!-- List View -->
+                    <div id="bus-lines-list">
+                        <h3 style="margin-top: 0;">Lignes de Bus</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Sélectionnez
+                            une ligne pour voir le trajet</p>
+
+                        <!-- Nearby Stops Button -->
+                        <button class="btn-primary" onclick="window.PublicTransportManager.showNearbyStops()"
+                            style="width: 100%; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span>📍</span>
+                            <span>Arrêts près de moi</span>
+                        </button>
+
+                        <!-- Bus lines injected here -->
+                    </div>
+
+                    <!-- Details View (Hidden by default) -->
+                    <div id="selected-line-details" class="hidden">
+                        <!-- Line details injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Panel: Map -->
+                <div style="flex: 1; position: relative;">
+                    <div id="transport-map" style="width: 100%; height: 100%; border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
     </div>
 
     <!-- Tourism Modals -->
     <!-- Rentals Modal -->
-    <div id="tourism-rentals-modal" class="modal">
+    <div id="tourism-rentals-modal" class="modal hidden">
         <div class="modal-content large">
             <div class="modal-header">
                 <h2>🚗 Location de Véhicules</h2>
                 <span class="close"
-                    onclick="document.getElementById('tourism-rentals-modal').style.display='none'">&times;</span>
+                    onclick="document.getElementById('tourism-rentals-modal').classList.add('hidden')">&times;</span>
             </div>
             <div class="modal-content-body">
                 <!-- Content loaded dynamically -->
@@ -560,12 +612,12 @@
     </div>
 
     <!-- Monuments Modal -->
-    <div id="tourism-monuments-modal" class="modal">
+    <div id="tourism-monuments-modal" class="modal hidden">
         <div class="modal-content large">
             <div class="modal-header">
                 <h2>🏛️ Monuments Historiques</h2>
                 <span class="close"
-                    onclick="document.getElementById('tourism-monuments-modal').style.display='none'">&times;</span>
+                    onclick="document.getElementById('tourism-monuments-modal').classList.add('hidden')">&times;</span>
             </div>
             <div class="modal-content-body">
                 <!-- Content loaded dynamically -->
@@ -574,12 +626,12 @@
     </div>
 
     <!-- Restaurants Modal -->
-    <div id="tourism-restaurants-modal" class="modal">
+    <div id="tourism-restaurants-modal" class="modal hidden">
         <div class="modal-content large">
             <div class="modal-header">
                 <h2>🍽️ Restaurants</h2>
                 <span class="close"
-                    onclick="document.getElementById('tourism-restaurants-modal').style.display='none'">&times;</span>
+                    onclick="document.getElementById('tourism-restaurants-modal').classList.add('hidden')">&times;</span>
             </div>
             <div class="modal-content-body">
                 <!-- Content loaded dynamically -->
@@ -587,37 +639,83 @@
         </div>
     </div>
 
+    <!-- Useful Contacts Modal -->
+    <div id="tourism-contacts-modal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>📞 Contacts Utiles</h2>
+                <span class="close"
+                    onclick="document.getElementById('tourism-contacts-modal').classList.add('hidden')">&times;</span>
+            </div>
+            <div class="modal-content-body">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tourism Shopping Modal -->
+    <div id="modal-tourism-shopping" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h4>🛍️ Conseils Shopping & Artisanat</h4>
+                <span class="close-modal" onclick="window.TourismManager.closeShoppingModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; max-height: 70vh;">
+
+                <!-- Tips Section -->
+                <div
+                    style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <h5 style="margin-top: 0; color: #0369a1;">💡 Conseils d'Achat</h5>
+                    <ul style="margin: 0.5rem 0 0 1.5rem; color: #0c4a6e; font-size: 0.9rem;">
+                        <li><strong>Négociation :</strong> C'est la règle dans les souks. Restez souriant mais ferme.
+                        </li>
+                        <li><strong>Qualité :</strong> Vérifiez les finitions (coutures, matériaux). Le "vrai cuir" sent
+                            le cuir.</li>
+                        <li><strong>Prix Fixes :</strong> Si vous n'aimez pas négocier, privilégiez les coopératives et
+                            l'Ensemble Artisanal.</li>
+                    </ul>
+                </div>
+
+                <!-- Shopping List -->
+                <div id="shopping-list-container" style="display: grid; gap: 1rem;">
+                    <!-- Shopping items injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <link rel="stylesheet" href="css/tourism.css">
-    <script src="js/config.js?v=1.4.0"></script>
-    <script src="js/utils.js?v=1.4.0"></script>
-    <script src="js/auth.js?v=1.4.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/charts.js?v=1.4.0"></script>
-    <script src="js/storage.js?v=1.4.0"></script>
-    <script src="js/car_data.js?v=1.4.0"></script>
-    <script src="js/provider_data.js?v=1.4.0"></script>
-    <script src="js/provider_manager.js?v=1.4.0"></script>
-    <script src="js/provider_ui.js?v=1.4.0"></script>
-    <script src="js/ai_service.js?v=1.6.0"></script>
-    <script src="js/provider_search.js?v=1.4.0"></script>
-    <script src="js/vehicles_database.js?v=1.5.0"></script>
-    <script src="js/car_advisor.js?v=1.5.0"></script>
-    <script src="js/voice_assistant.js?v=1.5.0"></script>
-    <script src="js/qr_scanner.js?v=1.5.0"></script>
-    <script src="js/comparator.js?v=1.0"></script>
-    <script src="js/best_route.js?v=1.0"></script>
-    <script src="js/parking_finder.js?v=1.0"></script>
-    <script src="js/tourism_data.js?v=1.0"></script>
-    <script src="js/tourism.js?v=1.0"></script>
-    <script src="js/vehicle.js?v=1.4.0"></script>
-    <script src="js/document.js?v=1.4.0"></script>
-    <script src="js/maintenance.js?v=1.4.0"></script>
-    <script src="js/dashboard.js?v=1.4.0"></script>
-    <script src="js/notification.js?v=1.4.0"></script>
-    <script src="js/settings.js?v=1.4.0"></script>
-    <script src="js/ui.js?v=1.4.0"></script>
-    <script src="js/app.js?v=1.4.0"></script>
+    <script src="js/config.js?v=1.4.0" defer></script>
+    <script src="js/utils.js?v=1.4.0" defer></script>
+    <script src="js/auth.js?v=1.4.0" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="js/charts.js?v=1.4.0" defer></script>
+    <script src="js/storage.js?v=1.4.0" defer></script>
+    <script src="js/car_data.js?v=1.4.0" defer></script>
+    <script src="js/provider_data.js?v=1.4.0" defer></script>
+    <script src="js/provider_manager.js?v=1.4.0" defer></script>
+    <script src="js/provider_ui.js?v=1.4.0" defer></script>
+    <script src="js/ai_service.js?v=1.6.0" defer></script>
+    <script src="js/provider_search.js?v=1.4.0" defer></script>
+    <script src="js/vehicles_database.js?v=1.5.0" defer></script>
+    <script src="js/car_advisor.js?v=1.5.0" defer></script>
+    <script src="js/voice_assistant.js?v=1.5.0" defer></script>
+    <script src="js/qr_scanner.js?v=1.5.0" defer></script>
+    <script src="js/comparator.js?v=1.0" defer></script>
+    <script src="js/best_route.js?v=1.0" defer></script>
+    <script src="js/public_transport.js?v=1.0" defer></script>
+    <script src="js/parking_finder.js?v=1.0" defer></script>
+    <script src="js/tourism_data.js?v=1.1.0" defer></script>
+    <script src="js/tourism.js?v=1.1.0" defer></script>
+    <script src="js/vehicle.js?v=1.4.0" defer></script>
+    <script src="js/document.js?v=1.4.0" defer></script>
+    <script src="js/maintenance.js?v=1.4.0" defer></script>
+    <script src="js/dashboard.js?v=1.4.0" defer></script>
+    <script src="js/notification.js?v=1.4.0" defer></script>
+    <script src="js/settings.js?v=1.4.0" defer></script>
+    <script src="js/ui.js?v=1.4.0" defer></script>
+    <script src="js/app.js?v=1.5.0" defer></script>
 </body>
 
 </html>

@@ -284,6 +284,29 @@ Si vous avez un appareil iOS :
 **Résultat :** ✅ PASS / ❌ FAIL
 
 ---
+ 
+ ### Use Case 8 : Test Parking Finder (Mode Mock)
+ 
+ **Objectif :** Vérifier que le module de recherche de parking fonctionne en mode démonstration (sans clé API)
+ 
+ **Prérequis :**
+ - [x] Application ouverte
+ - [x] Pas de clé API Google Maps configurée (ou internet coupé pour forcer le fallback)
+ 
+ **Étapes :**
+ 
+ | # | Action | Résultat Attendu | ✓ |
+ |---|--------|------------------|---|
+ | 1 | Cliquer sur "Parking Marrakech" dans le menu | Modale "Trouver un Parking" s'ouvre | ☐ |
+ | 2 | Vérifier la carte | Affiche "Mode Démonstration" avec icône 🗺️ | ☐ |
+ | 3 | Cliquer sur "Rechercher des parkings" | - Bouton indique "Recherche en cours..."<br>- Liste se remplit après délai | ☐ |
+ | 4 | Vérifier les résultats | - Au moins 3 parkings affichés (Koutoubia, Jemaa el-Fna, Carré Eden)<br>- Statut "Ouvert" visible | ☐ |
+ | 5 | Cliquer sur "Y aller" sur un résultat | Ouvre Google Maps dans un nouvel onglet | ☐ |
+ | 6 | Cliquer sur "Voir sur carte" | (En mode mock, peut ne rien faire ou centrer une carte vide - à vérifier) | ☐ |
+ 
+ **Résultat :** ✅ PASS / ❌ FAIL
+ 
+ ---
 
 ## 🎯 Checklist Rapide de Test
 
@@ -320,6 +343,12 @@ Si vous avez un appareil iOS :
 - [ ] Mode clair : tout visible et lisible
 - [ ] Mode sombre : tout visible et lisible
 - [ ] Transitions thème sans erreur
+ 
+ ### Parking Finder
+ - [ ] Modale s'ouvre
+ - [ ] Mode Démonstration s'affiche (si pas de clé)
+ - [ ] Recherche retourne des résultats
+ - [ ] Liens "Y aller" fonctionnent
 
 ---
 
@@ -368,6 +397,7 @@ Si vous avez un appareil iOS :
 | UC5 - Mobile Responsive | ☐ PASS ☐ FAIL | |
 | UC6 - Thème Sombre | ☐ PASS ☐ FAIL | |
 | UC7 - Compatibilité Navigateurs | ☐ PASS ☐ FAIL | |
+ | UC8 - Parking Finder (Mock) | ☐ PASS ☐ FAIL | |
 
 ### Bugs Trouvés
 

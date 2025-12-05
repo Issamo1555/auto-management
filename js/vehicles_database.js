@@ -16,6 +16,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Essence"],
         transmission: ["Manuelle"],
         consommation: { ville: 5.5, route: 4.2, mixte: 4.9 }, // Diesel
+        performance: {
+            puissance: 95, // ch
+            couple: 220, // Nm
+            vitesse_max: 179, // km/h
+            acceleration: 12.0 // 0-100 km/h (s)
+        },
         places: 5,
         coffre: 528, // Litres
         image: "assets/cars/dacia_logan.jpg", // Placeholder
@@ -42,6 +48,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Essence"],
         transmission: ["Manuelle", "Automatique"], // CVT sur Stepway
         consommation: { ville: 6.0, route: 4.5, mixte: 5.2 },
+        performance: {
+            puissance: 100,
+            couple: 160,
+            vitesse_max: 183,
+            acceleration: 11.5
+        },
         places: 5,
         coffre: 328,
         scoring: {
@@ -67,6 +79,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Essence"],
         transmission: ["Automatique", "Manuelle"],
         consommation: { ville: 6.5, route: 4.8, mixte: 5.5 },
+        performance: {
+            puissance: 84,
+            couple: 118,
+            vitesse_max: 171,
+            acceleration: 12.6
+        },
         places: 4, // Souvent 4 ou 5 serrées
         coffre: 252,
         scoring: {
@@ -92,6 +110,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Essence", "Hybride"],
         transmission: ["Manuelle", "Automatique"],
         consommation: { ville: 5.2, route: 3.8, mixte: 4.4 }, // Diesel
+        performance: {
+            puissance: 100,
+            couple: 260,
+            vitesse_max: 188,
+            acceleration: 11.4
+        },
         places: 5,
         coffre: 391,
         scoring: {
@@ -117,6 +141,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Essence", "Electrique"],
         transmission: ["Manuelle", "Automatique"],
         consommation: { ville: 5.0, route: 3.8, mixte: 4.2 }, // Diesel
+        performance: {
+            puissance: 100,
+            couple: 250,
+            vitesse_max: 188,
+            acceleration: 10.9
+        },
         places: 5,
         coffre: 311,
         scoring: {
@@ -144,6 +174,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel"],
         transmission: ["Manuelle", "Automatique"], // EDC dispo
         consommation: { ville: 6.0, route: 4.8, mixte: 5.3 },
+        performance: {
+            puissance: 115,
+            couple: 260,
+            vitesse_max: 183,
+            acceleration: 10.5
+        },
         places: 5,
         coffre: 445,
         scoring: {
@@ -169,6 +205,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Hybride"],
         transmission: ["Automatique"],
         consommation: { ville: 7.0, route: 5.5, mixte: 6.2 },
+        performance: {
+            puissance: 136,
+            couple: 320,
+            vitesse_max: 180,
+            acceleration: 11.4
+        },
         places: 5,
         coffre: 598,
         scoring: {
@@ -194,6 +236,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Hybride"],
         transmission: ["Automatique"],
         consommation: { ville: 6.5, route: 5.0, mixte: 5.8 },
+        performance: {
+            puissance: 130,
+            couple: 300,
+            vitesse_max: 192,
+            acceleration: 10.8
+        },
         places: 5,
         coffre: 520,
         scoring: {
@@ -221,6 +269,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Hybride", "Essence"],
         transmission: ["Automatique"],
         consommation: { ville: 7.5, route: 5.2, mixte: 6.0 },
+        performance: {
+            puissance: 190,
+            couple: 400,
+            vitesse_max: 240,
+            acceleration: 7.4
+        },
         places: 5,
         coffre: 480,
         scoring: {
@@ -246,6 +300,12 @@ const VEHICLES_DATABASE = [
         carburant: ["Diesel", "Hybride"],
         transmission: ["Automatique"],
         consommation: { ville: 8.0, route: 6.0, mixte: 7.0 },
+        performance: {
+            puissance: 194,
+            couple: 400,
+            vitesse_max: 215,
+            acceleration: 7.9
+        },
         places: 5,
         coffre: 550,
         scoring: {

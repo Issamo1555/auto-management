@@ -53,6 +53,7 @@ class TourismManager {
         const rentals = window.TourismDataHelpers.getRentalsByCity(this.currentCity);
         const monuments = window.TourismDataHelpers.getMonumentsByCity(this.currentCity);
         const restaurants = window.TourismDataHelpers.getRestaurantsByCity(this.currentCity);
+        const contacts = window.TourismDataHelpers.getContactsByCity(this.currentCity);
 
         container.innerHTML = `
             <div class="tourism-overview">
@@ -78,6 +79,20 @@ class TourismManager {
                         <h3>Restaurants</h3>
                         <p>${restaurants.length} établissements</p>
                         <button class="btn-primary">Voir</button>
+                    </div>
+
+                    <div class="category-card" data-tourism-category="contacts">
+                        <div class="category-icon">📞</div>
+                        <h3>Contacts Utiles</h3>
+                        <p>${contacts.length} contacts</p>
+                        <button class="btn-primary">Consulter</button>
+                    </div>
+
+                    <div class="category-card" data-tourism-category="shopping">
+                        <div class="category-icon">🛍️</div>
+                        <h3>Shopping & Artisanat</h3>
+                        <p>Conseils & Adresses</p>
+                        <button class="btn-primary">Découvrir</button>
                     </div>
                 </div>
 
@@ -133,6 +148,12 @@ class TourismManager {
             case 'restaurants':
                 this.showRestaurants();
                 break;
+            case 'contacts':
+                this.showContacts();
+                break;
+            case 'shopping':
+                this.showShopping();
+                break;
         }
     }
 
@@ -172,7 +193,7 @@ class TourismManager {
             });
         });
 
-        modal.style.display = 'block';
+        modal.classList.remove('hidden');
     }
 
     /**
@@ -250,7 +271,7 @@ class TourismManager {
             </div>
         `;
 
-        modal.style.display = 'block';
+        modal.classList.remove('hidden');
     }
 
     /**
@@ -328,7 +349,7 @@ class TourismManager {
             });
         });
 
-        modal.style.display = 'block';
+        modal.classList.remove('hidden');
     }
 
     /**
@@ -386,6 +407,112 @@ class TourismManager {
                         📞 ${restaurant.reservationRequired ? 'Réserver' : 'Appeler'}
                     </button>
                     <button class="btn-primary" onclick="TourismManager.navigate(${restaurant.location.lat}, ${restaurant.location.lng})">
+                        🗺️ Y aller
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Show contacts
+     */
+    showContacts() {
+        const modal = document.getElementById('tourism-contacts-modal');
+        if (!modal) return;
+
+        const contacts = window.TourismDataHelpers.getContactsByCity(this.currentCity);
+
+        const content = modal.querySelector('.modal-content-body');
+        content.innerHTML = `
+            <div class="contacts-list">
+                ${contacts.map(contact => this.renderContactCard(contact)).join('')}
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
+    /**
+     * Render contact card
+     */
+    renderContactCard(contact) {
+        return `
+            <div class="tourism-card">
+                <div class="card-header">
+                    <h4>${contact.type === 'change' ? '💱' : '🚨'} ${contact.name}</h4>
+                    <span class="type-badge">${contact.type}</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">${contact.description}</p>
+                    <p class="hours">🕐 ${contact.openingHours}</p>
+                    <p class="address">📍 ${contact.address}</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-secondary" onclick="TourismManager.call('${contact.phone}')">
+                        📞 Appeler
+                    </button>
+                    ${contact.location ? `
+                    <button class="btn-primary" onclick="TourismManager.navigate(${contact.location.lat}, ${contact.location.lng})">
+                        🗺️ Y aller
+                    </button>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Show shopping
+     */
+    showShopping() {
+        const modal = document.getElementById('modal-tourism-shopping');
+        if (!modal) return;
+
+        const shops = window.TourismDataHelpers.getShoppingByCity(this.currentCity);
+        const container = document.getElementById('shopping-list-container');
+
+        if (container) {
+            if (shops.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">Aucune adresse disponible pour cette ville.</p>';
+            } else {
+                container.innerHTML = shops.map(shop => this.renderShoppingCard(shop)).join('');
+            }
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    /**
+     * Close shopping modal
+     */
+    closeShoppingModal() {
+        const modal = document.getElementById('modal-tourism-shopping');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Render shopping card
+     */
+    renderShoppingCard(shop) {
+        return `
+            <div class="tourism-card">
+                <div class="card-header">
+                    <h4>🛍️ ${shop.name}</h4>
+                    <span class="type-badge">${shop.type}</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">${shop.description}</p>
+                    <div class="tags" style="margin-bottom: 0.5rem;">
+                        ${shop.tags.map(tag => `<span class="feature-tag" style="background: #e0f2fe; color: #0284c7;">${tag}</span>`).join('')}
+                    </div>
+                    ${shop.tips ? `<p class="tips" style="background: #fffbeb; color: #92400e; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem;">💡 <strong>Conseil:</strong> ${shop.tips}</p>` : ''}
+                    <p class="hours">🕐 ${shop.openingHours}</p>
+                    <p class="address">📍 ${shop.address}</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary" onclick="TourismManager.navigate(${shop.location.lat}, ${shop.location.lng})">
                         🗺️ Y aller
                     </button>
                 </div>

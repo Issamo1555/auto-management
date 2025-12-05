@@ -619,6 +619,272 @@ body {
     flex-direction: column;
 }
 
+/* Best Route & Parking Finder Modal Specifics */
+#modal-best-route .modal-content,
+#modal-parking-finder .modal-content {
+    max-width: 95vw;
+    height: 90vh;
+}
+
+#modal-best-route .modal-body,
+#modal-parking-finder .modal-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+}
+
+/* Left Panel (Form & Results) */
+#modal-best-route .modal-body>div:first-child,
+#modal-parking-finder .modal-body>div:first-child {
+    width: 350px;
+    min-width: 300px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Right Panel (Map) */
+#modal-best-route .modal-body>div:last-child,
+#modal-parking-finder .modal-body>div:last-child {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
+}
+
+/* Route Details Scrollable Area */
+#route-details {
+    margin-top: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Responsive adjustments for modals */
+@media (max-width: 768px) {
+
+    #modal-best-route .modal-body,
+    #modal-parking-finder .modal-body {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    #modal-best-route .modal-body>div:first-child,
+    #modal-parking-finder .modal-body>div:first-child {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        max-height: 50vh;
+    }
+
+    #modal-best-route .modal-body>div:last-child,
+    #modal-parking-finder .modal-body>div:last-child,
+    #modal-public-transport .modal-body>div:last-child {
+        height: 300px;
+        min-height: 300px;
+    }
+}
+
+/* Public Transport Specifics */
+#modal-public-transport .modal-content {
+    max-width: 95vw;
+    height: 90vh;
+}
+
+#modal-public-transport .modal-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+}
+
+#modal-public-transport .modal-body>div:first-child {
+    width: 350px;
+    min-width: 300px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-public-transport .modal-body>div:last-child {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
+}
+
+/* Bus Line Card */
+.bus-line-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bus-line-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary-color);
+}
+
+.bus-line-card .line-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.bus-line-card .line-number {
+    color: white;
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    min-width: 32px;
+    text-align: center;
+}
+
+.bus-line-card .line-number.large {
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.bus-line-card .line-name {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.bus-line-card .line-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.bus-line-card .line-info p {
+    margin: 0.25rem 0;
+}
+
+/* Line Details */
+.line-details-header {
+    margin-bottom: 1.5rem;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-back:hover {
+    text-decoration: underline;
+}
+
+.line-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-box {
+    background: var(--background-color);
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-box .label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.stat-box .value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Stops Timeline */
+.stops-timeline {
+    position: relative;
+    padding-left: 1rem;
+    margin-top: 1rem;
+}
+
+.stops-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.stop-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.stop-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--primary-color);
+    z-index: 1;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.stop-info {
+    flex: 1;
+}
+
+.stop-name {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.stop-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+    font-weight: 600;
+}
+
+.stop-tag.start {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.stop-tag.end {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 .modal-header {
     padding: 1.5rem;
     border-bottom: 1px solid var(--border-color);

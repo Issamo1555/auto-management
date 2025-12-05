@@ -332,6 +332,15 @@ class App {
             return;
         }
 
+        if (viewName === 'public-transport') {
+            if (window.PublicTransportManager) {
+                window.PublicTransportManager.openModal();
+            } else {
+                container.innerHTML = '<p class="error">Erreur: Module Transports non chargé.</p>';
+            }
+            return;
+        }
+
         if (viewName === 'tourism') {
             if (window.TourismManager) {
                 container.innerHTML = `

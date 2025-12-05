@@ -1,6 +1,6 @@
 /**
- * Parking Finder Module
- * Trouve les parkings disponibles à Marrakech avec Google Places API
+ * Parking Finder Module - Leaflet/OpenStreetMap Version
+ * Trouve les parkings disponibles à Marrakech
  */
 
 class ParkingFinder {
@@ -8,340 +8,187 @@ class ParkingFinder {
         this.parkings = [];
         this.map = null;
         this.markers = [];
-        this.infoWindows = [];
     }
 
     /**
-     * Initialize map for parking search
+     * Initialize Leaflet map for parking search
      */
-    async initMap(containerId, center = { lat: 31.6295, lng: -7.9811 }) {
-        if (!window.google || !window.google.maps) {
-            await this.loadGoogleMaps();
-        }
-
+    async initMap(containerId, center = [31.6295, -7.9811]) {
         const mapContainer = document.getElementById(containerId);
         if (!mapContainer) {
             console.error('Map container not found');
             return;
         }
 
-        this.map = new google.maps.Map(mapContainer, {
-            zoom: 13,
-            center: center, // Marrakech center
-            mapTypeControl: true,
-            streetViewControl: false,
-            fullscreenControl: true,
-            styles: [
-                {
-                    featureType: 'poi.business',
-                    stylers: [{ visibility: 'off' }]
-                }
-            ]
-        });
-    }
-
-    /**
-     * Load Google Maps API
-     */
-    loadGoogleMaps() {
-        return new Promise((resolve, reject) => {
-            if (window.google && window.google.maps) {
-                resolve();
-                return;
-            }
-
-            const apiKey = window.APP_CONFIG?.GOOGLE_MAPS_API_KEY || '';
-            if (!apiKey) {
-                reject(new Error('Google Maps API key not configured'));
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-            script.async = true;
-            script.defer = true;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Failed to load Google Maps'));
-            document.head.appendChild(script);
-        });
-    }
-
-    /**
-     * Search for parkings in Marrakech
-     */
-    async searchParkings(location = null, radius = 5000) {
-        if (!this.map) {
-            await this.initMap('parking-map');
-        }
-
-        // Default to Marrakech center if no location provided
-        const searchLocation = location || { lat: 31.6295, lng: -7.9811 };
-
-        const service = new google.maps.places.PlacesService(this.map);
-
-        const request = {
-            location: searchLocation,
-            radius: radius,
-            type: 'parking',
-            keyword: 'parking'
-        };
-
-        return new Promise((resolve, reject) => {
-            service.nearbySearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    this.parkings = results;
-                    this.displayParkingsOnMap(results);
-                    resolve(results);
-                } else {
-                    console.error('Places search failed:', status);
-                    reject(new Error(`Erreur de recherche: ${status}`));
-                }
-            });
-        });
-    }
-
-    /**
-     * Display parkings on map with markers
-     */
-    displayParkingsOnMap(parkings) {
-        // Clear existing markers
-        this.clearMarkers();
-
-        parkings.forEach((parking, index) => {
-            const marker = new google.maps.Marker({
-                position: parking.geometry.location,
-                map: this.map,
-                title: parking.name,
-                animation: google.maps.Animation.DROP,
-                icon: {
-                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                }
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-                content: this.createInfoWindowContent(parking)
-            });
-
-            marker.addListener('click', () => {
-                // Close all other info windows
-                this.infoWindows.forEach(iw => iw.close());
-                infoWindow.open(this.map, marker);
-            });
-
-            this.markers.push(marker);
-            this.infoWindows.push(infoWindow);
-        });
-
-        // Fit map to show all markers
-        if (parkings.length > 0) {
-            const bounds = new google.maps.LatLngBounds();
-            parkings.forEach(parking => {
-                bounds.extend(parking.geometry.location);
-            });
-            this.map.fitBounds(bounds);
-        }
-    }
-
-    /**
-     * Create info window content for parking
-     */
-    createInfoWindowContent(parking) {
-        const rating = parking.rating ? `⭐ ${parking.rating}/5` : 'Pas de note';
-        const openNow = parking.opening_hours?.open_now ? '🟢 Ouvert' : '🔴 Fermé';
-
-        return `
-            <div style="padding: 10px; max-width: 250px;">
-                <h4 style="margin: 0 0 8px 0; color: #2563eb;">${parking.name}</h4>
-                <p style="margin: 4px 0; font-size: 0.9rem;">${parking.vicinity}</p>
-                <p style="margin: 4px 0; font-size: 0.9rem;">${rating}</p>
-                <p style="margin: 4px 0; font-size: 0.9rem;">${openNow}</p>
-                <button onclick="window.ParkingFinder.navigateToParking(${parking.geometry.location.lat()}, ${parking.geometry.location.lng()})" 
-                    style="margin-top: 8px; padding: 6px 12px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    🗺️ Y aller
-                </button>
-            </div>
-        `;
-    }
-
-    /**
-     * Clear all markers from map
-     */
-    clearMarkers() {
-        this.markers.forEach(marker => marker.setMap(null));
-        this.markers = [];
-        this.infoWindows = [];
-    }
-
-    /**
-     * Navigate to parking
-     */
-    navigateToParking(lat, lng) {
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-        window.open(url, '_blank');
-    }
-
-    /**
-     * Render parkings list
-     */
-    renderParkingsList(parkings) {
-        const container = document.getElementById('parking-list');
-        if (!container) return;
-
-        if (parkings.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-secondary);">Aucun parking trouvé dans cette zone.</p>';
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet library not loaded');
             return;
         }
 
-        let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+        // Initialize Leaflet map
+        this.map = L.map(containerId).setView(center, 13);
 
-        parkings.forEach((parking, index) => {
-            const rating = parking.rating ? `⭐ ${parking.rating}/5` : 'Pas de note';
-            const openNow = parking.opening_hours?.open_now ?
-                '<span style="color: #10b981;">🟢 Ouvert</span>' :
-                '<span style="color: #ef4444;">🔴 Fermé</span>';
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(this.map);
 
-            const distance = parking.geometry?.location ?
-                this.calculateDistance(
-                    { lat: 31.6295, lng: -7.9811 },
-                    { lat: parking.geometry.location.lat(), lng: parking.geometry.location.lng() }
-                ) : null;
+        console.log('✅ Parking Finder Map initialized');
+    }
 
-            html += `
-                <div class="parking-card" style="padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                        <h4 style="margin: 0; color: var(--text-primary);">${index + 1}. ${parking.name}</h4>
-                        ${openNow}
+    /**
+     * Search for parkings (mock data)
+     */
+    async searchParkings(location) {
+        // Clear previous markers
+        this.clearMarkers();
+
+        // Mock parking data for Marrakech
+        this.parkings = [
+            {
+                name: 'Parking Koutoubia',
+                address: 'Avenue Mohammed V, Marrakech',
+                lat: 31.6258,
+                lng: -7.9891,
+                capacity: 200,
+                price: '10 DH/heure',
+                available: true
+            },
+            {
+                name: 'Parking Jamâa El Fna',
+                address: 'Place Jamâa El Fna, Marrakech',
+                lat: 31.6253,
+                lng: -7.9898,
+                capacity: 150,
+                price: '15 DH/heure',
+                available: true
+            },
+            {
+                name: 'Parking Gueliz',
+                address: 'Avenue Mohammed V, Gueliz',
+                lat: 31.6350,
+                lng: -8.0100,
+                capacity: 300,
+                price: '8 DH/heure',
+                available: true
+            },
+            {
+                name: 'Parking Menara Mall',
+                address: 'Avenue Menara, Marrakech',
+                lat: 31.6150,
+                lng: -8.0200,
+                capacity: 500,
+                price: 'Gratuit (clients)',
+                available: true
+            }
+        ];
+
+        // Display parkings on map
+        this.displayParkingsOnMap();
+
+        // Render list
+        this.renderParkingList();
+
+        return this.parkings;
+    }
+
+    /**
+     * Display parkings on map
+     */
+    displayParkingsOnMap() {
+        if (!this.map) return;
+
+        const bounds = L.latLngBounds();
+
+        this.parkings.forEach(parking => {
+            const marker = L.marker([parking.lat, parking.lng], {
+                icon: L.divIcon({
+                    className: 'parking-marker',
+                    html: `<div style="background: #2563eb; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">🅿️</div>`,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                })
+            }).addTo(this.map);
+
+            marker.bindPopup(`
+                <div style="min-width: 200px;">
+                    <strong style="color: #2563eb; font-size: 1.1em;">${parking.name}</strong><br>
+                    <p style="margin: 0.5rem 0; color: #666;">${parking.address}</p>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span>💰 ${parking.price}</span>
+                        <span>🚗 ${parking.capacity} places</span>
                     </div>
-                    <p style="margin: 4px 0; color: var(--text-secondary); font-size: 0.9rem;">📍 ${parking.vicinity}</p>
-                    <p style="margin: 4px 0; color: var(--text-secondary); font-size: 0.9rem;">${rating}</p>
-                    ${distance ? `<p style="margin: 4px 0; color: var(--text-secondary); font-size: 0.9rem;">📏 ~${distance} km du centre</p>` : ''}
-                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-                        <button class="btn btn-primary" onclick="window.ParkingFinder.navigateToParking(${parking.geometry.location.lat()}, ${parking.geometry.location.lng()})" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
-                            🗺️ Y aller
-                        </button>
-                        <button class="btn btn-secondary" onclick="window.ParkingFinder.showOnMap(${index})" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
-                            📍 Voir sur carte
-                        </button>
+                    ${parking.available ? '<span style="color: #10b981; font-weight: bold;">✓ Disponible</span>' : '<span style="color: #ef4444;">✗ Complet</span>'}
+                </div>
+            `);
+
+            this.markers.push(marker);
+            bounds.extend([parking.lat, parking.lng]);
+        });
+
+        // Fit map to show all parkings
+        if (this.parkings.length > 0) {
+            this.map.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
+
+    /**
+     * Render parking list
+     */
+    renderParkingList() {
+        const container = document.getElementById('parking-list');
+        if (!container) return;
+
+        let html = '<h4>🅿️ Parkings trouvés</h4>';
+
+        this.parkings.forEach((parking, index) => {
+            html += `
+                <div class="parking-item" onclick="window.ParkingFinder.focusParking(${index})">
+                    <div class="parking-header">
+                        <strong>${parking.name}</strong>
+                        <span class="parking-price">${parking.price}</span>
+                    </div>
+                    <p class="parking-address">${parking.address}</p>
+                    <div class="parking-info">
+                        <span>🚗 ${parking.capacity} places</span>
+                        <span class="${parking.available ? 'available' : 'full'}">
+                            ${parking.available ? '✓ Disponible' : '✗ Complet'}
+                        </span>
                     </div>
                 </div>
             `;
         });
 
-        html += '</div>';
         container.innerHTML = html;
     }
 
     /**
-     * Show specific parking on map
+     * Focus on a specific parking
      */
-    showOnMap(index) {
-        if (index >= 0 && index < this.markers.length) {
-            const marker = this.markers[index];
-            const infoWindow = this.infoWindows[index];
+    focusParking(index) {
+        const parking = this.parkings[index];
+        if (!parking || !this.map) return;
 
-            // Close all info windows
-            this.infoWindows.forEach(iw => iw.close());
-
-            // Open selected info window
-            infoWindow.open(this.map, marker);
-
-            // Center map on marker
-            this.map.setCenter(marker.getPosition());
-            this.map.setZoom(15);
-        }
+        this.map.setView([parking.lat, parking.lng], 16);
+        this.markers[index].openPopup();
     }
 
     /**
-     * Calculate distance between two points (Haversine formula)
+     * Clear all markers
      */
-    calculateDistance(point1, point2) {
-        const R = 6371; // Earth radius in km
-        const dLat = this.toRad(point2.lat - point1.lat);
-        const dLon = this.toRad(point2.lng - point1.lng);
+    clearMarkers() {
+        if (!this.map) return;
 
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(this.toRad(point1.lat)) * Math.cos(this.toRad(point2.lat)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c;
-
-        return distance.toFixed(1);
-    }
-
-    /**
-     * Convert degrees to radians
-     */
-    toRad(degrees) {
-        return degrees * (Math.PI / 180);
-    }
-
-    /**
-     * Search parkings from UI
-     */
-    async searchFromUI() {
-        const btn = document.getElementById('btn-search-parking');
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = '🔍 Recherche en cours...';
-        }
-
-        try {
-            // Get user location or use Marrakech center
-            let location = { lat: 31.6295, lng: -7.9811 };
-
-            const useCurrentLocation = document.getElementById('use-current-location')?.checked;
-            if (useCurrentLocation) {
-                try {
-                    const userLocation = await this.getCurrentLocation();
-                    location = userLocation;
-                } catch (error) {
-                    console.log('Could not get user location, using Marrakech center');
-                }
-            }
-
-            const parkings = await this.searchParkings(location);
-            this.renderParkingsList(parkings);
-
-            if (btn) {
-                btn.disabled = false;
-                btn.textContent = '🔍 Rechercher des parkings';
-            }
-        } catch (error) {
-            alert('❌ Erreur lors de la recherche:\n' + error.message);
-            if (btn) {
-                btn.disabled = false;
-                btn.textContent = '🔍 Rechercher des parkings';
-            }
-        }
-    }
-
-    /**
-     * Get current location
-     */
-    getCurrentLocation() {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error('Géolocalisation non supportée'));
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    resolve({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (error) => {
-                    reject(error);
-                }
-            );
+        this.markers.forEach(marker => {
+            this.map.removeLayer(marker);
         });
+        this.markers = [];
     }
 
     /**
-     * Open parking finder modal
+     * Open parking modal
      */
     openModal() {
         const modal = document.getElementById('modal-parking-finder');
@@ -349,13 +196,13 @@ class ParkingFinder {
             modal.classList.remove('hidden');
             setTimeout(() => {
                 this.initMap('parking-map');
-                this.searchFromUI();
+                this.searchParkings('Marrakech');
             }, 100);
         }
     }
 
     /**
-     * Close parking finder modal
+     * Close parking modal
      */
     closeModal() {
         const modal = document.getElementById('modal-parking-finder');
@@ -365,5 +212,7 @@ class ParkingFinder {
     }
 }
 
-// Initialize and export
+// Initialize
 window.ParkingFinder = new ParkingFinder();
+
+console.log('✅ Parking Finder (Leaflet) loaded');

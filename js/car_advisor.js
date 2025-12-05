@@ -638,6 +638,38 @@ class CarAdvisor {
         }).join('')}
                     </tr>
                     <tr>
+                        <th>Puissance</th>
+                        ${selectedCars.map(car => {
+            const val = car.performance ? car.performance.puissance : '-';
+            const maxVal = Math.max(...selectedCars.map(c => c.performance ? c.performance.puissance : 0));
+            return `<td class="${val === maxVal ? 'cell-winner' : ''}">${val} ch</td>`;
+        }).join('')}
+                    </tr>
+                    <tr>
+                        <th>Couple</th>
+                        ${selectedCars.map(car => {
+            const val = car.performance ? car.performance.couple : '-';
+            const maxVal = Math.max(...selectedCars.map(c => c.performance ? c.performance.couple : 0));
+            return `<td class="${val === maxVal ? 'cell-winner' : ''}">${val} Nm</td>`;
+        }).join('')}
+                    </tr>
+                    <tr>
+                        <th>0-100 km/h</th>
+                        ${selectedCars.map(car => {
+            const val = car.performance ? car.performance.acceleration : '-';
+            const minVal = Math.min(...selectedCars.map(c => c.performance ? c.performance.acceleration : 999));
+            return `<td class="${val === minVal ? 'cell-winner' : ''}">${val} s</td>`;
+        }).join('')}
+                    </tr>
+                    <tr>
+                        <th>Vitesse Max</th>
+                        ${selectedCars.map(car => {
+            const val = car.performance ? car.performance.vitesse_max : '-';
+            const maxVal = Math.max(...selectedCars.map(c => c.performance ? c.performance.vitesse_max : 0));
+            return `<td class="${val === maxVal ? 'cell-winner' : ''}">${val} km/h</td>`;
+        }).join('')}
+                    </tr>
+                    <tr>
                         <th>Carburant</th>
                         ${selectedCars.map(car => `<td>${car.carburant.join(', ')}</td>`).join('')}
                     </tr>

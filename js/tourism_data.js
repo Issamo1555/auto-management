@@ -407,6 +407,59 @@ window.TopRestaurants = [
     }
 ];
 
+// Shopping & Artisanat
+window.ShoppingPlaces = [
+    // Marrakech
+    {
+        id: "shop_mar_001",
+        name: "Ensemble Artisanal",
+        city: "Marrakech",
+        type: "Artisanat",
+        description: "Complexe d'État regroupant les meilleurs artisans. Prix fixes et affichés, idéal pour éviter la négociation tout en garantissant la qualité.",
+        address: "Avenue Mohammed V, Marrakech",
+        location: { lat: 31.6258, lng: -7.9981 },
+        openingHours: "9h-19h",
+        tips: "Prix fixes, pas de négociation. Idéal pour comparer les prix avant d'aller au souk.",
+        tags: ["Prix Fixes", "Qualité Garantie", "Artisanat"]
+    },
+    {
+        id: "shop_mar_002",
+        name: "Souk Semmarine",
+        city: "Marrakech",
+        type: "Bazar",
+        description: "L'artère principale des souks. On y trouve de tout : tapis, cuir, lampes, vêtements. L'ambiance est électrique.",
+        address: "Médina, Marrakech",
+        location: { lat: 31.6275, lng: -7.9880 },
+        openingHours: "9h-21h",
+        tips: "Négociation obligatoire ! Commencez à 1/3 du prix annoncé. Attention aux 'faux guides'.",
+        tags: ["Authentique", "Négociation", "Variété"]
+    },
+    {
+        id: "shop_mar_003",
+        name: "Coopérative Al Kawtar",
+        city: "Marrakech",
+        type: "Vêtements Traditionnels",
+        description: "Coopérative de femmes handicapées produisant des broderies et vêtements de haute qualité. Achat solidaire.",
+        address: "Gueliz, Marrakech",
+        location: { lat: 31.6340, lng: -8.0050 },
+        openingHours: "10h-18h",
+        tips: "Excellent pour le linge de maison et les vêtements brodés main.",
+        tags: ["Solidaire", "Fait Main", "Qualité"]
+    },
+    {
+        id: "shop_mar_004",
+        name: "Place des Épices (Rahba Kedima)",
+        city: "Marrakech",
+        type: "Bazar",
+        description: "Place célèbre pour ses épices, tapis berbères et vannerie. Moins oppressant que les ruelles étroites.",
+        address: "Rahba Kedima, Médina",
+        location: { lat: 31.6289, lng: -7.9883 },
+        openingHours: "9h-20h",
+        tips: "Meilleur endroit pour acheter du safran et des mélanges d'épices (Ras el Hanout).",
+        tags: ["Épices", "Tapis", "Vannerie"]
+    }
+];
+
 // Helper functions
 window.TourismDataHelpers = {
     /**
@@ -447,6 +500,14 @@ window.TourismDataHelpers = {
     },
 
     /**
+     * Get shopping places by city
+     */
+    getShoppingByCity(city) {
+        if (!window.ShoppingPlaces) return [];
+        return window.ShoppingPlaces.filter(shop => shop.city === city);
+    },
+
+    /**
      * Get all cities
      */
     getAllCities() {
@@ -454,9 +515,82 @@ window.TourismDataHelpers = {
         window.RentalAgencies.forEach(a => cities.add(a.city));
         window.HistoricalMonuments.forEach(m => cities.add(m.city));
         window.TopRestaurants.forEach(r => cities.add(r.city));
+        if (window.UsefulContacts) {
+            window.UsefulContacts.forEach(c => cities.add(c.city));
+        }
         return Array.from(cities).sort();
+    },
+
+    /**
+     * Get contacts by city
+     */
+    getContactsByCity(city) {
+        if (!window.UsefulContacts) return [];
+        return window.UsefulContacts.filter(contact => contact.city === city || contact.city === 'Maroc'); // Include national contacts
     }
 };
+
+// Useful Contacts
+window.UsefulContacts = [
+    // Marrakech - Exchange
+    {
+        id: "contact_mar_001",
+        name: "Chez Ali Change",
+        city: "Marrakech",
+        type: "change",
+        description: "Bureau de change réputé pour ses taux compétitifs.",
+        phone: "+212 524-444999",
+        address: "Rue Moulay Ismaïl, Marrakech",
+        location: { lat: 31.6253, lng: -7.9898 },
+        openingHours: "9h-20h"
+    },
+    {
+        id: "contact_mar_002",
+        name: "Hôtel Farouk Change",
+        city: "Marrakech",
+        type: "change",
+        description: "Service de change fiable situé à l'hôtel Farouk.",
+        phone: "+212 524-433333",
+        address: "66 Avenue Hassan II, Marrakech",
+        location: { lat: 31.6345, lng: -8.0056 },
+        openingHours: "24h/24"
+    },
+
+    // Emergency - National
+    {
+        id: "contact_nat_001",
+        name: "Police Secours",
+        city: "Maroc",
+        type: "urgence",
+        description: "Police nationale pour les urgences.",
+        phone: "19",
+        address: "National",
+        location: null,
+        openingHours: "24h/24"
+    },
+    {
+        id: "contact_nat_002",
+        name: "Ambulance / Pompiers",
+        city: "Maroc",
+        type: "urgence",
+        description: "Protection civile pour les urgences médicales et incendies.",
+        phone: "15",
+        address: "National",
+        location: null,
+        openingHours: "24h/24"
+    },
+    {
+        id: "contact_nat_003",
+        name: "Gendarmerie Royale",
+        city: "Maroc",
+        type: "urgence",
+        description: "Pour les urgences hors des zones urbaines.",
+        phone: "177",
+        address: "National",
+        location: null,
+        openingHours: "24h/24"
+    }
+];
 
 // console.log('✅ Tourism data loaded:', {
 //     rentals: window.RentalAgencies.length,
