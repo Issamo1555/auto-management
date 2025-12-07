@@ -8,7 +8,14 @@ class App {
     }
 
     init() {
-        // Check Authentication first
+        // Initialize I18n first
+        if (window.I18n) {
+            window.I18n.applyLanguage();
+        }
+
+        // Language selector will be initialized from DOMContentLoaded
+
+        // Check Authentication
         if (window.AuthManager && !window.AuthManager.checkAuth()) {
             this.showAuthScreen();
             return;
@@ -35,6 +42,37 @@ class App {
             const settings = window.SettingsManager.getSettings();
             window.SettingsManager.applyTheme(settings.theme);
         }
+
+        // Listen for language changes
+        window.addEventListener('languageChanged', () => {
+            this.handleLanguageChange();
+        });
+    }
+
+    /**
+     * Setup Language Selector in Top Bar
+     */
+    setupLanguageSelector() {
+        const selector = document.getElementById('top-bar-language-selector');
+        if (!selector) {
+            console.warn('⚠️ Language selector not found');
+            return;
+        }
+
+        if (!window.I18n) {
+            console.error('❌ window.I18n not available');
+            return;
+        }
+
+        // Set current language
+        selector.value = window.I18n.getCurrentLanguage();
+        console.log('✅ Language selector initialized with:', selector.value);
+
+        // Listen for changes
+        selector.addEventListener('change', (e) => {
+            console.log('🌍 Language changed to:', e.target.value);
+            window.I18n.setLanguage(e.target.value);
+        });
     }
 
     /**
@@ -370,17 +408,67 @@ class App {
             </div >
     `;
     }
-}
 
-// Initialize App when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new App();
+    handleLanguageChange() {
+        // Re-render current view to apply new translations
+        const hash = window.location.hash.substring(1);
+        const viewName = hash || 'dashboard';
+        const viewContainer = document.getElementById('view-container');
 
-    // Initialize notifications and provider search after a short delay to ensure all modules are loaded
-    setTimeout(() => {
-        if (window.NotificationManager) {
-            window.NotificationManager.init();
+        if (viewContainer) {
+            this.loadView(viewName, viewContainer);
         }
 
-    }, 1000);
-});
+        // Update page title
+        const pageTitle = document.getElementById('page-title');
+        if (pageTitle && window.I18n) {
+            const navLinks = document.querySelectorAll('.nav-links li');
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-view') === viewName) {
+                    const span = link.querySelector('[data-i18n]');
+                    if (span) {
+                        const key = span.dataset.i18n;
+                        pageTitle.textContent = window.I18n.t(key);
+                    }
+                }
+            });
+        }
+
+        // Sync top bar language selector
+        const topBarSelector = document.getElementById('top-bar-language-selector');
+        if (topBarSelector && window.I18n) {
+            topBarSelector.value = window.I18n.getCurrentLanguage();
+        }
+    }
+}
+
+// Initialize App - since this script has defer, DOM is already ready
+console.log('🚀 App.js loaded');
+console.log('📦 window.I18n available:', !!window.I18n);
+console.log('📦 window.AuthManager available:', !!window.AuthManager);
+
+window.app = new App();
+console.log('✅ App initialized');
+
+// Initialize notifications and provider search after a short delay to ensure all modules are loaded
+setTimeout(() => {
+    if (window.NotificationManager) {
+        window.NotificationManager.init();
+    }
+}, 1000);
+
+// Initialize language selector AFTER everything else
+setTimeout(() => {
+    console.log('⏰ Language selector timeout fired');
+    console.log('📦 window.app exists:', !!window.app);
+    console.log('📦 window.I18n exists:', !!window.I18n);
+
+    if (window.app && window.I18n) {
+        console.log('🎯 Calling setupLanguageSelector()');
+        window.app.setupLanguageSelector();
+    } else {
+        console.error('❌ Cannot initialize language selector');
+        console.error('   - window.app:', window.app);
+        console.error('   - window.I18n:', window.I18n);
+    }
+}, 500);

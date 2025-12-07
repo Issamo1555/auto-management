@@ -60,37 +60,37 @@
             </div>
             <ul class="nav-links">
                 <li class="active" data-view="dashboard">
-                    <span class="icon">■</span> Tableau de bord
+                    <span class="icon">■</span> <span data-i18n="nav.dashboard">Tableau de bord</span>
                 </li>
                 <li data-view="vehicles">
-                    <span class="icon">▶</span> Véhicules
+                    <span class="icon">▶</span> <span data-i18n="nav.vehicles">Véhicules</span>
                 </li>
                 <li data-view="documents">
-                    <span class="icon">📄</span> Documents
+                    <span class="icon">📄</span> <span data-i18n="nav.documents">Documents</span>
                 </li>
                 <li data-view="providers">
-                    <span class="icon">🔧</span> Fournisseurs
+                    <span class="icon">🔧</span> <span data-i18n="nav.providers">Fournisseurs</span>
                 </li>
                 <li data-view="best-route">
-                    <span class="icon">🗺️</span> Meilleur trajet
+                    <span class="icon">🗺️</span> <span data-i18n="nav.best_route">Meilleur trajet</span>
                 </li>
                 <li data-view="public-transport">
-                    <span class="icon">🚌</span> Transports
+                    <span class="icon">🚌</span> <span data-i18n="nav.transport">Transports</span>
                 </li>
                 <li data-view="parking">
-                    <span class="icon">🅿️</span> Parking Marrakech
+                    <span class="icon">🅿️</span> <span data-i18n="nav.parking">Parking Marrakech</span>
                 </li>
                 <li data-view="tourism">
-                    <span class="icon">🌍</span> Tourisme
+                    <span class="icon">🌍</span> <span data-i18n="nav.tourism">Tourisme</span>
                 </li>
                 <li data-view="car-advisor">
-                    <span class="icon">💡</span> Conseiller d'Achat
+                    <span class="icon">💡</span> <span data-i18n="nav.car_advisor">Conseiller d'Achat</span>
                 </li>
                 <li data-view="maintenance">
-                    <span class="icon">⚒</span> Entretien
+                    <span class="icon">⚒</span> <span data-i18n="nav.maintenance">Entretien</span>
                 </li>
                 <li data-view="settings">
-                    <span class="icon">⚙</span> Paramètres
+                    <span class="icon">⚙</span> <span data-i18n="nav.settings">Paramètres</span>
                 </li>
             </ul>
         </nav>
@@ -100,10 +100,11 @@
             <header class="top-bar">
                 <button class="menu-toggle" id="menu-toggle">☰</button>
                 <div class="search-container">
-                    <input type="text" id="global-search" placeholder="Rechercher..." autocomplete="off">
+                    <input type="text" id="global-search" data-i18n="common.search" placeholder="Rechercher..."
+                        autocomplete="off">
                     <div id="search-results" class="search-results hidden"></div>
                 </div>
-                <h2 id="page-title">Tableau de bord</h2>
+                <h2 id="page-title" data-i18n="nav.dashboard">Tableau de bord</h2>
                 <div class="user-profile">
                     <button id="voice-assistant-btn" class="btn-icon" title="Assistant Vocal">
                         🎤
@@ -113,6 +114,15 @@
                         📱
                         <span class="status-badge" style="display: none;"></span>
                     </button>
+                    <!-- Language Selector -->
+                    <select id="top-bar-language-selector" class="language-selector" title="Changer de langue"
+                        onchange="if(window.I18n) window.I18n.setLanguage(this.value)">
+                        <option value="fr">🇫🇷</option>
+                        <option value="en">🇬🇧</option>
+                        <option value="ar">🇲🇦</option>
+                        <option value="es">🇪🇸</option>
+                        <option value="de">🇩🇪</option>
+                    </select>
                     <button id="theme-toggle" class="btn-icon" title="Changer de thème">🌓</button>
                     <span class="notification-badge" id="notification-bell">◉</span>
                     <div class="avatar" id="user-avatar">U</div>
@@ -686,6 +696,8 @@
 
     <!-- Scripts -->
     <link rel="stylesheet" href="css/tourism.css">
+    <!-- I18n must load first -->
+    <script src="js/i18n.js?v=1.0.3"></script>
     <script src="js/config.js?v=1.4.0" defer></script>
     <script src="js/utils.js?v=1.4.0" defer></script>
     <script src="js/auth.js?v=1.4.0" defer></script>
@@ -710,12 +722,12 @@
     <script src="js/tourism.js?v=1.1.0" defer></script>
     <script src="js/vehicle.js?v=1.4.0" defer></script>
     <script src="js/document.js?v=1.4.0" defer></script>
-    <script src="js/maintenance.js?v=1.4.0" defer></script>
+    <script src="js/maintenance.js?v=1.5.0" defer></script>
     <script src="js/dashboard.js?v=1.4.0" defer></script>
     <script src="js/notification.js?v=1.4.0" defer></script>
     <script src="js/settings.js?v=1.4.0" defer></script>
     <script src="js/ui.js?v=1.4.0" defer></script>
-    <script src="js/app.js?v=1.5.0" defer></script>
+    <script src="js/app.js?v=1.6.0" defer></script>
 </body>
 
 </html>

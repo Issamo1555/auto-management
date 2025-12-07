@@ -59,6 +59,54 @@ body {
     height: 100%;
 }
 
+/* RTL Support for Arabic */
+body.rtl {
+    direction: rtl;
+}
+
+body.rtl #app {
+    flex-direction: row-reverse;
+}
+
+body.rtl .sidebar {
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+body.rtl .nav-links li {
+    flex-direction: row-reverse;
+}
+
+body.rtl .top-bar {
+    flex-direction: row-reverse;
+}
+
+body.rtl .user-profile {
+    flex-direction: row-reverse;
+}
+
+body.rtl .search-container {
+    margin: 0 1rem;
+}
+
+body.rtl .modal-header,
+body.rtl .card-header,
+body.rtl .card-footer {
+    flex-direction: row-reverse;
+}
+
+body.rtl .info-item {
+    text-align: right;
+}
+
+body.rtl .btn {
+    flex-direction: row-reverse;
+}
+
+body.rtl .module-header {
+    flex-direction: row-reverse;
+}
+
 /* Sidebar */
 .sidebar {
     width: 260px;
@@ -178,6 +226,34 @@ body {
     align-items: center;
     gap: 1rem;
     flex-shrink: 0;
+}
+
+/* Language Selector in Top Bar */
+.language-selector {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+.language-selector:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.language-selector:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* RTL Support for Language Selector */
+body.rtl .language-selector {
+    direction: ltr;
+    /* Keep flags in correct order */
 }
 
 /* --- Search Bar --- */

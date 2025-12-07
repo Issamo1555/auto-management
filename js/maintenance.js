@@ -17,6 +17,23 @@ class MaintenanceManager {
         ];
     }
 
+    /**
+     * Get translated maintenance types
+     */
+    getTypes() {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
+        return [
+            t('maintenance.type_oil_change'),
+            t('maintenance.type_tires'),
+            t('maintenance.type_brakes'),
+            t('maintenance.type_filters'),
+            t('maintenance.type_battery'),
+            t('maintenance.type_service'),
+            t('maintenance.type_repair'),
+            t('maintenance.type_other')
+        ];
+    }
+
     getAll() {
         return window.StorageManager.get(this.STORAGE_KEY);
     }
@@ -100,16 +117,17 @@ class MaintenanceManager {
     }
 
     renderView(container) {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
         const vehicles = window.VehicleManager ? window.VehicleManager.getAll() : [];
 
         if (vehicles.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon">⚒</div>
-                    <p>Aucun véhicule trouvé.</p>
-                    <p class="sub-text">Ajoutez un véhicule pour suivre son entretien.</p>
+                    <p>${t('maintenance.no_vehicles')}</p>
+                    <p class="sub-text">${t('maintenance.add_vehicle_first')}</p>
                     <button class="btn btn-primary" style="margin-top:1rem" onclick="document.querySelector('[data-view=vehicles]').click()">
-                        Aller aux Véhicules
+                        ${t('maintenance.go_to_vehicles')}
                     </button>
                 </div>
             `;
@@ -118,13 +136,13 @@ class MaintenanceManager {
 
         const html = `
             <div class="module-header">
-                <h3>Entretien & Maintenance</h3>
+                <h3>${t('maintenance.title')}</h3>
                 <div class="header-actions">
                     <select id="vehicle-selector-maint" class="form-select">
                         ${vehicles.map(v => `<option value="${v.id}">${v.make} ${v.model} (${v.plate})</option>`).join('')}
                     </select>
                     <button id="btn-add-maint" class="btn btn-primary">
-                        <span class="icon">+</span> Nouvelle Intervention
+                        <span class="icon">+</span> ${t('maintenance.new_maintenance')}
                     </button>
                 </div>
             </div>
@@ -144,7 +162,7 @@ class MaintenanceManager {
             <div id="modal-add-maint" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4>Nouvelle Intervention</h4>
+                        <h4>${t('maintenance.new_maintenance')}</h4>
                         <span class="close-modal">&times;</span>
                     </div>
                     <form id="form-add-maint">
@@ -152,41 +170,32 @@ class MaintenanceManager {
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Date</label>
+                                <label>${t('maintenance.date')}</label>
                                 <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}">
                             </div>
                             <div class="form-group">
-                                <label>Type</label>
+                                <label>${t('maintenance.type')}</label>
                                 <select name="type" id="input-maint-type" required class="form-select" style="width:100%">
-                                    ${this.types.map(t => `<option value="${t}">${t}</option>`).join('')}
+                                    ${this.getTypes().map(type => `<option value="${type}">${type}</option>`).join('')}
                                 </select>
-                                <input type="text" id="input-maint-type-other" name="typeOther" class="hidden" placeholder="Saisir le type d'intervention" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Kilométrage</label>
+                                <label>${t('maintenance.mileage')} (${t('maintenance.optional')})</label>
                                 <input type="number" name="mileage" placeholder="ex: 50000">
                             </div>
                             <div class="form-group">
-                                <label>Coût (€)</label>
+                                <label>${t('maintenance.cost')} (€)</label>
                                 <input type="number" name="cost" step="0.01" placeholder="0.00">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Description / Notes</label>
-                            <input type="text" name="notes" placeholder="Détails de l'intervention...">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Garage / Prestataire</label>
-                            <div style="display:flex; gap:10px;">
-                                <input type="text" name="provider" placeholder="ex: Garage du Centre" style="flex:1">
-                                <button type="button" class="btn btn-secondary" id="btn-find-provider" style="white-space:nowrap;">
-                                    🔍 Trouver un Fournisseur
-                                </button>
+                            <label>${t('maintenance.notes')} (${t('maintenance.optional')})</label>
+                            <input type="text" name="notes" placeholder="${t('maintenance.notes')}...">
+                        </div>        </button>
                             </div>
                         </div>
 

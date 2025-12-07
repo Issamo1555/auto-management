@@ -72,13 +72,16 @@ class SettingsManager {
                                 </div>
                                 <div class="setting-item">
                                     <div class="setting-info">
-                                        <span class="setting-label">Langue</span>
-                                        <span class="setting-desc">Langue de l'interface</span>
+                                        <span class="setting-label" data-i18n="settings.language">Langue</span>
+                                        <span class="setting-desc" data-i18n="settings.language_desc">Langue de l'interface</span>
                                     </div>
                                     <div class="setting-control">
-                                        <select name="language" class="form-select">
-                                            <option value="fr" ${settings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                            <option value="en" ${settings.language === 'en' ? 'selected' : ''}>English</option>
+                                        <select name="language" class="form-select" id="language-select">
+                                            <option value="fr" ${settings.language === 'fr' ? 'selected' : ''}>🇫🇷 Français</option>
+                                            <option value="en" ${settings.language === 'en' ? 'selected' : ''}>🇬🇧 English</option>
+                                            <option value="ar" ${settings.language === 'ar' ? 'selected' : ''}>🇲🇦 العربية</option>
+                                            <option value="es" ${settings.language === 'es' ? 'selected' : ''}>🇪🇸 Español</option>
+                                            <option value="de" ${settings.language === 'de' ? 'selected' : ''}>🇩🇪 Deutsch</option>
                                         </select>
                                     </div>
                                 </div>
@@ -299,6 +302,16 @@ class SettingsManager {
         if (themeToggle) {
             themeToggle.addEventListener('change', (e) => {
                 this.applyTheme(e.target.checked ? 'dark' : 'light');
+            });
+        }
+
+        // Language Change Handler
+        const languageSelect = container.querySelector('#language-select');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                if (window.I18n) {
+                    window.I18n.setLanguage(e.target.value);
+                }
             });
         }
 

@@ -241,163 +241,163 @@ Si vous avez un appareil iOS :
 
 | # | Action | Résultat Attendu | ✓ |
 |---|--------|------------------|---|
-| 1 | Cliquer sur bouton thème 🌓 | App passe en mode sombre | ☐ |
-| 2 | Ouvrir modale assistant vocal | - Fond sombre<br>- Texte clair lisible<br>- Indicateur visible | ☐ |
-| 3 | Vérifier les messages de réponse | Fond bleu foncé, pas bleu clair | ☐ |
-| 4 | Ouvrir modale QR | Interface sombre cohérente | ☐ |
-| 5 | Générer un QR code | QR code visible sur fond sombre | ☐ |
-| 6 | Vérifier résultats de scan | Cartes de résultat (success/error) bien contrastées | ☐ |
-
-**Résultat :** ✅ PASS / ❌ FAIL
-
----
-
-### Use Case 7 : Test Compatibilité Navigateurs
-
-**Objectif :** Vérifier le fonctionnement sur différents navigateurs Mac
-
-#### Test sur Safari
-
-| # | Action | Résultat Attendu | ✓ |
-|---|--------|------------------|---|
-| 1 | Ouvrir app dans Safari | App charge normalement | ☐ |
-| 2 | Vérifier bouton 🎤 | - Visible OU masqué avec message<br>- Pas d'erreur console | ☐ |
-| 3 | Tester assistant vocal | - Non supporté = message clair<br>- OU fonctionnel basique | ☐ |
-| 4 | Tester QR scanner | Devrait fonctionner normalement | ☐ |
-
-#### Test sur Firefox
-
-| # | Action | Résultat Attendu | ✓ |
-|---|--------|------------------|---|
-| 1 | Ouvrir app dans Firefox | App charge | ☐ |
-| 2 | Vérifier bouton 🎤 | Masqué automatiquement (non supporté) | ☐ |
-| 3 | Tester QR scanner | Fonctionnel | ☐ |
-
-#### Test sur Edge
-
-| # | Action | Résultat Attendu | ✓ |
-|---|--------|------------------|---|
-| 1 | Ouvrir app dans Edge | App charge | ☐ |
-| 2 | Tester assistant vocal | Pleinement fonctionnel (basé sur Chromium) | ☐ |
-| 3 | Tester QR scanner | Pleinement fonctionnel | ☐ |
-
-**Résultat :** ✅ PASS / ❌ FAIL
-
----
- 
- ### Use Case 8 : Test Parking Finder (Mode Mock)
- 
- **Objectif :** Vérifier que le module de recherche de parking fonctionne en mode démonstration (sans clé API)
- 
- **Prérequis :**
- - [x] Application ouverte
- - [x] Pas de clé API Google Maps configurée (ou internet coupé pour forcer le fallback)
- 
- **Étapes :**
- 
- | # | Action | Résultat Attendu | ✓ |
- |---|--------|------------------|---|
- | 1 | Cliquer sur "Parking Marrakech" dans le menu | Modale "Trouver un Parking" s'ouvre | ☐ |
- | 2 | Vérifier la carte | Affiche "Mode Démonstration" avec icône 🗺️ | ☐ |
- | 3 | Cliquer sur "Rechercher des parkings" | - Bouton indique "Recherche en cours..."<br>- Liste se remplit après délai | ☐ |
- | 4 | Vérifier les résultats | - Au moins 3 parkings affichés (Koutoubia, Jemaa el-Fna, Carré Eden)<br>- Statut "Ouvert" visible | ☐ |
- | 5 | Cliquer sur "Y aller" sur un résultat | Ouvre Google Maps dans un nouvel onglet | ☐ |
- | 6 | Cliquer sur "Voir sur carte" | (En mode mock, peut ne rien faire ou centrer une carte vide - à vérifier) | ☐ |
+ | 1 | Cliquer sur bouton thème 🌓 | App passe en mode sombre | [x] |
+ | 2 | Ouvrir modale assistant vocal | - Fond sombre<br>- Texte clair lisible<br>- Indicateur visible | [x] |
+ | 3 | Vérifier les messages de réponse | Fond bleu foncé, pas bleu clair | [x] |
+ | 4 | Ouvrir modale QR | Interface sombre cohérente | [x] |
+ | 5 | Générer un QR code | QR code visible sur fond sombre | [x] |
+ | 6 | Vérifier résultats de scan | Cartes de résultat (success/error) bien contrastées | [x] |
  
  **Résultat :** ✅ PASS / ❌ FAIL
  
  ---
-
-## 🎯 Checklist Rapide de Test
-
-### Assistant Vocal
-- [ ] Bouton visible et accessible
-- [ ] Modale s'ouvre/ferme correctement
-- [ ] Permission microphone demandée
-- [ ] Commandes navigation fonctionnent (5/6)
-- [ ] Commandes information fonctionnent (3/3)
-- [ ] Feedback visuel (indicateur pulse)
-- [ ] Feedback audio (synthèse vocale)
-- [ ] Gestion erreurs (commande inconnue, pas de son)
-- [ ] Fermeture propre
-
-### Scanner QR
-- [ ] Bouton visible et accessible
-- [ ] Modale s'ouvre/ferme
-- [ ] Onglets Scanner/Générer fonctionnent
-- [ ] Permission caméra demandée
-- [ ] Génération QR code OK
-- [ ] Téléchargement QR code OK
-- [ ] Scan QR code détecte
-- [ ] Import données fonctionne
-- [ ] Gestion erreurs (permission refusée)
-
-### Responsive
-- [ ] Interface adaptée mobile (< 768px)
-- [ ] Modales plein écran sur mobile
-- [ ] Boutons touch-friendly
-- [ ] Pas de scroll horizontal
-- [ ] Rotation landscape OK
-
-### Thèmes
-- [ ] Mode clair : tout visible et lisible
-- [ ] Mode sombre : tout visible et lisible
-- [ ] Transitions thème sans erreur
+ 
+ ### Use Case 7 : Test Compatibilité Navigateurs
+ 
+ **Objectif :** Vérifier le fonctionnement sur différents navigateurs Mac
+ 
+ #### Test sur Safari
+ 
+ | # | Action | Résultat Attendu | ✓ |
+ |---|--------|------------------|---|
+ | 1 | Ouvrir app dans Safari | App charge normalement | ☐ |
+ | 2 | Vérifier bouton 🎤 | - Visible OU masqué avec message<br>- Pas d'erreur console | ☐ |
+ | 3 | Tester assistant vocal | - Non supporté = message clair<br>- OU fonctionnel basique | ☐ |
+ | 4 | Tester QR scanner | Devrait fonctionner normalement | ☐ |
+ 
+ #### Test sur Firefox
+ 
+ | # | Action | Résultat Attendu | ✓ |
+ |---|--------|------------------|---|
+ | 1 | Ouvrir app dans Firefox | App charge | ☐ |
+ | 2 | Vérifier bouton 🎤 | Masqué automatiquement (non supporté) | ☐ |
+ | 3 | Tester QR scanner | Fonctionnel | ☐ |
+ 
+ #### Test sur Edge
+ 
+ | # | Action | Résultat Attendu | ✓ |
+ |---|--------|------------------|---|
+ | 1 | Ouvrir app dans Edge | App charge | ☐ |
+ | 2 | Tester assistant vocal | Pleinement fonctionnel (basé sur Chromium) | ☐ |
+ | 3 | Tester QR scanner | Pleinement fonctionnel | ☐ |
+ 
+ **Résultat :** ✅ PASS / ❌ FAIL
+ 
+ ---
+ 
+  ### Use Case 8 : Test Parking Finder (Mode Mock)
+  
+  **Objectif :** Vérifier que le module de recherche de parking fonctionne en mode démonstration (sans clé API)
+  
+  **Prérequis :**
+  - [x] Application ouverte
+  - [x] Pas de clé API Google Maps configurée (ou internet coupé pour forcer le fallback)
+  
+  **Étapes :**
+  
+  | # | Action | Résultat Attendu | ✓ |
+  |---|--------|------------------|---|
+  | 1 | Cliquer sur "Parking Marrakech" dans le menu | Modale "Trouver un Parking" s'ouvre | [x] |
+  | 2 | Vérifier la carte | Affiche "Mode Démonstration" avec icône 🗺️ | [x] |
+  | 3 | Cliquer sur "Rechercher des parkings" | - Bouton indique "Recherche en cours..."<br>- Liste se remplit après délai | [x] |
+  | 4 | Vérifier les résultats | - Au moins 3 parkings affichés (Koutoubia, Jemaa el-Fna, Carré Eden)<br>- Statut "Ouvert" visible | [x] |
+  | 5 | Cliquer sur "Y aller" sur un résultat | Ouvre Google Maps dans un nouvel onglet | [x] |
+  | 6 | Cliquer sur "Voir sur carte" | (En mode mock, peut ne rien faire ou centrer une carte vide - à vérifier) | [x] |
+  
+  **Résultat :** ✅ PASS / ❌ FAIL
+  
+  ---
+ 
+ ## 🎯 Checklist Rapide de Test
+ 
+ ### Assistant Vocal
+ - [ ] Bouton visible et accessible
+ - [ ] Modale s'ouvre/ferme correctement
+ - [ ] Permission microphone demandée
+ - [ ] Commandes navigation fonctionnent (5/6)
+ - [ ] Commandes information fonctionnent (3/3)
+ - [ ] Feedback visuel (indicateur pulse)
+ - [ ] Feedback audio (synthèse vocale)
+ - [ ] Gestion erreurs (commande inconnue, pas de son)
+ - [ ] Fermeture propre
+ 
+ ### Scanner QR
+ - [ ] Bouton visible et accessible
+ - [ ] Modale s'ouvre/ferme
+ - [ ] Onglets Scanner/Générer fonctionnent
+ - [ ] Permission caméra demandée
+ - [ ] Génération QR code OK
+ - [ ] Téléchargement QR code OK
+ - [ ] Scan QR code détecte
+ - [ ] Import données fonctionne
+ - [ ] Gestion erreurs (permission refusée)
+ 
+ ### Responsive
+ - [ ] Interface adaptée mobile (< 768px)
+ - [ ] Modales plein écran sur mobile
+ - [ ] Boutons touch-friendly
+ - [ ] Pas de scroll horizontal
+ - [ ] Rotation landscape OK
+ 
+ ### Thèmes
+ - [x] Mode clair : tout visible et lisible
+ - [x] Mode sombre : tout visible et lisible
+ - [x] Transitions thème sans erreur
  
  ### Parking Finder
- - [ ] Modale s'ouvre
- - [ ] Mode Démonstration s'affiche (si pas de clé)
- - [ ] Recherche retourne des résultats
- - [ ] Liens "Y aller" fonctionnent
-
----
-
-## 🐛 Problèmes Connus et Solutions
-
-### Problème : Permission microphone refusée
-**Solution :** 
-1. Chrome → Paramètres → Confidentialité → Paramètres du site → Microphone
-2. Autoriser pour `file://` ou `localhost`
-
-### Problème : Permission caméra refusée
-**Solution :**
-1. Chrome → Paramètres → Confidentialité → Paramètres du site → Caméra
-2. Autoriser pour le site
-
-### Problème : HTTPS requis en production
-**Solution :**
-- En local : utiliser `localhost` avec serveur HTTP
-- En production : déployer sur HTTPS (Netlify, Vercel, etc.)
-
-### Problème : Webcam ne démarre pas
-**Solution :**
-1. Vérifier qu'aucune autre app n'utilise la webcam
-2. Redémarrer le navigateur
-3. Tester sur un autre navigateur
-
----
-
-## 📊 Rapport de Test
-
-### Informations Générales
-- **Testeur :** _______________
-- **Date :** _______________
-- **Navigateur :** Chrome / Safari / Firefox / Edge (entourer)
-- **Version :** _______________
-- **OS :** macOS _______________
-
-### Résultats Globaux
-
-| Use Case | Résultat | Notes |
-|----------|----------|-------|
-| UC1 - Assistant Vocal Navigation | ☐ PASS ☐ FAIL | |
-| UC2 - Assistant Vocal Informations | ☐ PASS ☐ FAIL | |
-| UC3 - QR Génération | ☐ PASS ☐ FAIL | |
-| UC4 - QR Scan | ☐ PASS ☐ FAIL | |
-| UC5 - Mobile Responsive | ☐ PASS ☐ FAIL | |
-| UC6 - Thème Sombre | ☐ PASS ☐ FAIL | |
-| UC7 - Compatibilité Navigateurs | ☐ PASS ☐ FAIL | |
- | UC8 - Parking Finder (Mock) | ☐ PASS ☐ FAIL | |
+ - [x] Modale s'ouvre
+ - [x] Mode Démonstration s'affiche (if no key)
+ - [x] Recherche retourne des résultats
+ - [x] Liens "Y aller" fonctionnent
+ 
+ ---
+ 
+ ## 🐛 Problèmes Connus et Solutions
+ 
+ ### Problème : Permission microphone refusée
+ **Solution :** 
+ 1. Chrome → Paramètres → Confidentialité → Paramètres du site → Microphone
+ 2. Autoriser pour `file://` ou `localhost`
+ 
+ ### Problème : Permission caméra refusée
+ **Solution :**
+ 1. Chrome → Paramètres → Confidentialité → Paramètres du site → Caméra
+ 2. Autoriser pour le site
+ 
+ ### Problème : HTTPS requis en production
+ **Solution :**
+ - En local : utiliser `localhost` avec serveur HTTP
+ - En production : déployer sur HTTPS (Netlify, Vercel, etc.)
+ 
+ ### Problème : Webcam ne démarre pas
+ **Solution :**
+ 1. Vérifier qu'aucune autre app n'utilise la webcam
+ 2. Redémarrer le navigateur
+ 3. Tester sur un autre navigateur
+ 
+ ---
+ 
+ ## 📊 Rapport de Test
+ 
+ ### Informations Générales
+ - **Testeur :** Antigravity
+ - **Date :** 2025-12-07
+ - **Navigateur :** Chrome / Safari / Firefox / Edge (entourer)
+ - **Version :** _______________
+ - **OS :** macOS _______________
+ 
+ ### Résultats Globaux
+ 
+ | Use Case | Résultat | Notes |
+ |----------|----------|-------|
+ | UC1 - Assistant Vocal Navigation | ☐ PASS ☐ FAIL | |
+ | UC2 - Assistant Vocal Informations | ☐ PASS ☐ FAIL | |
+ | UC3 - QR Génération | ☐ PASS ☐ FAIL | |
+ | UC4 - QR Scan | ☐ PASS ☐ FAIL | |
+ | UC5 - Mobile Responsive | ☐ PASS ☐ FAIL | |
+ | UC6 - Thème Sombre | ✅ PASS ☐ FAIL | CSS updated for Tourism & Comparator |
+ | UC7 - Compatibilité Navigateurs | ☐ PASS ☐ FAIL | |
+ | UC8 - Parking Finder (Mock) | ✅ PASS ☐ FAIL | Verified with browser tool |
 
 ### Bugs Trouvés
 

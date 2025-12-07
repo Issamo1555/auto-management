@@ -46,12 +46,13 @@ class VehicleManager {
 
     renderView(container) {
         const vehicles = this.getAll();
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
 
         const html = `
             <div class="module-header">
-                <h3>Mes Véhicules</h3>
+                <h3>${t('vehicles.title')}</h3>
                 <button id="btn-add-vehicle" class="btn btn-primary">
-                    <span class="icon">+</span> Ajouter un véhicule
+                    <span class="icon">+</span> ${t('vehicles.add')}
                 </button>
             </div>
 
@@ -61,52 +62,52 @@ class VehicleManager {
             <div id="modal-add-vehicle" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4>Nouveau Véhicule</h4>
+                        <h4>${t('vehicles.new_vehicle')}</h4>
                         <span class="close-modal">&times;</span>
                     </div>
                     <form id="form-add-vehicle">
                         <div class="form-group">
-                            <label>Type de véhicule</label>
+                            <label>${t('vehicles.type')}</label>
                             <select name="vehicleType" id="input-vehicle-type" required class="form-select">
-                                <option value="">Sélectionner un type</option>
-                                <option value="car">Voiture</option>
-                                <option value="motorcycle">Moto</option>
-                                <option value="truck">Camion</option>
+                                <option value="">${t('vehicles.select_type')}</option>
+                                <option value="car">${t('vehicles.type_car')}</option>
+                                <option value="motorcycle">${t('vehicles.type_motorcycle')}</option>
+                                <option value="truck">${t('vehicles.type_truck')}</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Marque</label>
+                            <label>${t('vehicles.brand')}</label>
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <select name="make" id="input-make" required class="form-select" style="flex:1" disabled>
-                                    <option value="">Sélectionner d'abord un type</option>
+                                    <option value="">${t('vehicles.select_first_type')}</option>
                                 </select>
                                 <img id="preview-logo" src="" style="width:30px; height:30px; object-fit:contain; display:none;">
                             </div>
-                            <input type="text" id="input-make-other" name="makeOther" class="hidden" placeholder="Saisir la marque" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
+                            <input type="text" id="input-make-other" name="makeOther" class="hidden" placeholder="${t('vehicles.enter_brand')}" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         <div class="form-group">
-                            <label>Modèle</label>
+                            <label>${t('vehicles.model')}</label>
                             <select name="model" id="input-model" required class="form-select" disabled>
-                                <option value="">Sélectionner d'abord une marque</option>
+                                <option value="">${t('vehicles.select_first_brand')}</option>
                             </select>
-                            <input type="text" id="input-model-other" name="modelOther" class="hidden" placeholder="Saisir le modèle" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
+                            <input type="text" id="input-model-other" name="modelOther" class="hidden" placeholder="${t('vehicles.enter_model')}" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Année</label>
+                                <label>${t('vehicles.year')}</label>
                                 <input type="number" name="year" required placeholder="2020">
                             </div>
                             <div class="form-group">
-                                <label>Immatriculation</label>
+                                <label>${t('vehicles.plate')}</label>
                                 <input type="text" name="plate" required placeholder="AB-123-CD">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Kilométrage actuel</label>
+                            <label>${t('vehicles.current_mileage')}</label>
                             <input type="number" name="mileage" required placeholder="ex: 45000">
                         </div>
                         <div class="form-group">
-                            <label>Photo du véhicule (optionnel)</label>
+                            <label>${t('vehicles.photo')}</label>
                             <input type="file" id="input-vehicle-photo" accept="image/*">
                             <input type="hidden" name="photo" id="hidden-vehicle-photo">
                             <div id="vehicle-photo-preview" style="margin-top:10px; display:none;">
@@ -114,8 +115,8 @@ class VehicleManager {
                             </div>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary close-modal">${t('common.cancel')}</button>
+                            <button type="submit" class="btn btn-primary">${t('common.save')}</button>
                         </div>
                     </form>
                 </div>
@@ -127,7 +128,7 @@ class VehicleManager {
             <div id="modal-vehicle-details" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4>Détails du véhicule</h4>
+                        <h4>${t('vehicles.vehicle_details')}</h4>
                         <button class="close-modal" id="close-vehicle-details">✖️</button>
                     </div>
                     <div class="modal-body" id="vehicle-details-body">
@@ -147,12 +148,14 @@ class VehicleManager {
     }
 
     _renderVehicleList(vehicles) {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
+
         if (vehicles.length === 0) {
             return `
                 <div class="empty-state">
                     <div class="empty-icon">▶</div>
-                    <p>Aucun véhicule enregistré.</p>
-                    <p class="sub-text">Ajoutez votre premier véhicule pour commencer le suivi.</p>
+                    <p>${t('vehicles.no_vehicles')}</p>
+                    <p class="sub-text">${t('vehicles.add_first')}</p>
                 </div>
             `;
         }
@@ -171,18 +174,18 @@ class VehicleManager {
                         <div class="card-body">
                             <div class="info-grid">
                                 <div class="info-item">
-                                    <span class="info-label">Plaque</span>
+                                    <span class="info-label">${t('vehicles.plate_label')}</span>
                                     <span class="info-value">${v.plate}</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Kilométrage</span>
+                                    <span class="info-label">${t('vehicles.mileage')}</span>
                                     <span class="info-value">${parseInt(v.mileage).toLocaleString()} km</span>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button class="btn-icon edit-vehicle" onclick="window.VehicleManager.promptEdit('${v.id}')" title="Modifier">✎</button>
-                            <button class="btn-icon delete-vehicle" onclick="window.VehicleManager.promptDelete('${v.id}')" title="Supprimer">✕</button>
+                            <button class="btn-icon edit-vehicle" onclick="window.VehicleManager.promptEdit('${v.id}')" title="${t('common.edit')}">✎</button>
+                            <button class="btn-icon delete-vehicle" onclick="window.VehicleManager.promptDelete('${v.id}')" title="${t('common.delete')}">✕</button>
                         </div>
                     </div>
                 `).join('')}
@@ -268,9 +271,9 @@ class VehicleManager {
                 }
 
                 // Reset and populate brand dropdown
-                makeSelect.innerHTML = '<option value="">Sélectionner une marque</option>';
+                makeSelect.innerHTML = `<option value="">${window.I18n ? window.I18n.t('vehicles.select_brand') : 'Sélectionner une marque'}</option>`;
                 makeSelect.disabled = !vehicleType;
-                modelSelect.innerHTML = '<option value="">Sélectionner d\'abord une marque</option>';
+                modelSelect.innerHTML = `<option value="">${window.I18n ? window.I18n.t('vehicles.select_first_brand') : 'Sélectionner d\'abord une marque'}</option>`;
                 modelSelect.disabled = true;
                 logoPreview.style.display = 'none';
 
@@ -289,7 +292,7 @@ class VehicleManager {
                     // Add "Autre" option
                     const optOther = document.createElement('option');
                     optOther.value = "Autre";
-                    optOther.textContent = "Autre / Inconnu";
+                    optOther.textContent = window.I18n ? window.I18n.t('vehicles.other') : "Autre / Inconnu";
                     makeSelect.appendChild(optOther);
                 }
             });
@@ -316,7 +319,7 @@ class VehicleManager {
                 const brandData = dataSource ? dataSource.find(c => c.brand === brandName) : null;
 
                 // Reset Model
-                modelSelect.innerHTML = '<option value="">Sélectionner un modèle</option>';
+                modelSelect.innerHTML = `<option value="">${window.I18n ? window.I18n.t('vehicles.select_model') : 'Sélectionner un modèle'}</option>`;
                 modelSelect.disabled = !brandName;
                 modelOtherInput.classList.add('hidden');
 
@@ -345,7 +348,7 @@ class VehicleManager {
                 // Always add "Autre" option for models
                 const optOther = document.createElement('option');
                 optOther.value = "Autre";
-                optOther.innerText = "Autre / Inconnu";
+                optOther.innerText = window.I18n ? window.I18n.t('vehicles.other') : "Autre / Inconnu";
                 modelSelect.appendChild(optOther);
             });
         }
@@ -442,14 +445,14 @@ class VehicleManager {
         btnAdd.addEventListener('click', () => {
             form.reset();
             delete form.dataset.editingId;
-            modal.querySelector('.modal-header h4').textContent = 'Nouveau Véhicule';
+            modal.querySelector('.modal-header h4').textContent = window.I18n ? window.I18n.t('vehicles.new_vehicle') : 'Nouveau Véhicule';
 
             // Reset Preview
             if (photoPreview) photoPreview.style.display = 'none';
             if (photoHidden) photoHidden.value = '';
             if (logoPreview) logoPreview.style.display = 'none';
             if (modelSelect) {
-                modelSelect.innerHTML = '<option value="">Sélectionner d\'abord une marque</option>';
+                modelSelect.innerHTML = `<option value="">${window.I18n ? window.I18n.t('vehicles.select_first_brand') : 'Sélectionner d\'abord une marque'}</option>`;
                 modelSelect.disabled = true;
             }
 
@@ -462,7 +465,7 @@ class VehicleManager {
         const form = container.querySelector('#form-add-vehicle');
         const title = modal.querySelector('.modal-header h4');
 
-        title.textContent = 'Modifier le Véhicule';
+        title.textContent = window.I18n ? window.I18n.t('vehicles.edit_vehicle') : 'Modifier le Véhicule';
         form.dataset.editingId = vehicle.id;
 
         // Fill Basic Fields
@@ -501,7 +504,7 @@ class VehicleManager {
             // Populate Models based on Make
             const brandData = dataSource.find(c => c.brand === vehicle.make);
             if (brandData) {
-                modelSelect.innerHTML = '<option value="">Sélectionner un modèle</option>';
+                modelSelect.innerHTML = `<option value="">${window.I18n ? window.I18n.t('vehicles.select_model') : 'Sélectionner un modèle'}</option>`;
                 modelSelect.disabled = false;
 
                 if (brandData.models && brandData.models.length > 0) {
@@ -514,7 +517,7 @@ class VehicleManager {
                 } else {
                     const opt = document.createElement('option');
                     opt.value = "Autre";
-                    opt.textContent = "Autre / Inconnu";
+                    opt.textContent = window.I18n ? window.I18n.t('vehicles.other') : "Autre / Inconnu";
                     modelSelect.appendChild(opt);
                 }
 
@@ -554,14 +557,15 @@ class VehicleManager {
         const modal = document.getElementById('modal-vehicle-details');
         const body = document.getElementById('vehicle-details-body');
         if (!modal || !body) return;
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
         const html = `
             <div class="vehicle-detail">
             <div class="vehicle-detail">
                 ${vehicle.photo ? `<img src="${vehicle.photo}" style="width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin-bottom:1rem;" />` : (vehicle.logo ? `<img src="${vehicle.logo}" style="width:48px;height:48px;object-fit:contain;margin-bottom:1rem;" />` : '')}
                 <h4>${vehicle.make} ${vehicle.model} (${vehicle.year})</h4>
-                <p><strong>Plaque :</strong> ${vehicle.plate}</p>
-                <p><strong>Kilométrage :</strong> ${parseInt(vehicle.mileage).toLocaleString()} km</p>
-                <p><strong>Créé le :</strong> ${new Date(vehicle.createdAt).toLocaleDateString()}</p>
+                <p><strong>${t('vehicles.plate_label')} :</strong> ${vehicle.plate}</p>
+                <p><strong>${t('vehicles.mileage')} :</strong> ${parseInt(vehicle.mileage).toLocaleString()} km</p>
+                <p><strong>${t('vehicles.created_on')} :</strong> ${new Date(vehicle.createdAt).toLocaleDateString()}</p>
             </div>
         `;
         body.innerHTML = html;
@@ -577,7 +581,8 @@ class VehicleManager {
 
         if (!modal) {
             // Fallback if modal not found
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
+            const confirmMsg = window.I18n ? window.I18n.t('vehicles.delete_confirm') : 'Êtes-vous sûr de vouloir supprimer ce véhicule ?';
+            if (confirm(confirmMsg)) {
                 this.delete(id);
                 window.location.reload();
             }
@@ -585,7 +590,7 @@ class VehicleManager {
         }
 
         // Setup Modal
-        msg.textContent = 'Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible.';
+        msg.textContent = window.I18n ? window.I18n.t('vehicles.delete_confirm') : 'Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible.';
         modal.classList.remove('hidden');
 
         // Cleanup old listeners (simple way: clone node)

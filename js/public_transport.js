@@ -12,16 +12,18 @@ class PublicTransportManager {
         this.nearbyStopsData = [];
         this.updateInterval = null;
 
-        // Advanced features data
-        this.favorites = this.loadFavorites();
-        this.statistics = this.loadStatistics();
-        this.savedRoutes = this.loadSavedRoutes();
-        this.userPreferences = this.loadPreferences();
-        this.badges = this.loadBadges();
-        this.points = this.loadPoints();
+        // Initialize advanced features module
+        this.advanced = null; // Will be initialized after class definition
 
-        // Initialize statistics tracking
-        this.initializeStatistics();
+        // Temporary storage for advanced features data
+        this.tempAdvancedData = {
+            favorites: [],
+            statistics: {},
+            savedRoutes: [],
+            preferences: {},
+            badges: [],
+            points: 0
+        };
 
         // Real ALSA Marrakech Bus Lines Data
         this.busLines = [

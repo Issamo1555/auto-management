@@ -31,12 +31,15 @@ class DashboardManager {
         // Calculate Upcoming Maintenance
         const upcomingMaintenance = this._getUpcomingMaintenance(vehicles, maintenance);
 
+        // Get translations
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
+
         const html = `
             <div class="dashboard-grid">
                 <!-- Welcome Section -->
                 <div class="welcome-section">
-                    <h3>Bonjour, ${userName}</h3>
-                    <p>Voici un aperçu de votre flotte.</p>
+                    <h3>${t('dashboard.hello')}, ${userName}</h3>
+                    <p>${t('dashboard.fleet_overview')}</p>
                 </div>
 
                 <!-- Stats Cards -->
@@ -45,42 +48,42 @@ class DashboardManager {
                         <div class="dash-icon">▶</div>
                         <div class="dash-info">
                             <span class="dash-value">${totalVehicles}</span>
-                            <span class="dash-label">Véhicules</span>
+                            <span class="dash-label">${t('dashboard.total_vehicles')}</span>
                         </div>
                     </div>
                     <div class="dash-card ${activeAlerts > 0 ? 'red' : 'green'}" onclick="document.querySelector('[data-view=documents]').click()" style="cursor: pointer;">
                         <div class="dash-icon">◉</div>
                         <div class="dash-info">
                             <span class="dash-value">${activeAlerts}</span>
-                            <span class="dash-label">Alertes</span>
+                            <span class="dash-label">${t('dashboard.alerts')}</span>
                         </div>
                     </div>
                     <div class="dash-card purple" onclick="document.querySelector('[data-view=maintenance]').click()" style="cursor: pointer;">
                         <div class="dash-icon">$</div>
                         <div class="dash-info">
                             <span class="dash-value">${totalCost.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}</span>
-                            <span class="dash-label">Dépenses Totales</span>
+                            <span class="dash-label">${t('dashboard.total_expenses')}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Upcoming Maintenance Section -->
-                <div class="section-title">Prochains Entretiens (Estimations)</div>
+                <div class="section-title">${t('dashboard.upcoming_title')}</div>
                 <div class="upcoming-list">
                     ${this._renderUpcomingMaintenance(upcomingMaintenance)}
                 </div>
 
                 <!-- Statistics Charts -->
-                <div class="section-title">Statistiques Détaillées</div>
+                <div class="section-title">${t('dashboard.stats_title')}</div>
                 <div class="charts-row">
                     <div class="chart-container">
-                        <h4>Coût cumulé dans le temps</h4>
+                        <h4>${t('dashboard.cost_over_time')}</h4>
                         <div class="chart-wrapper">
                             <canvas id="chart-cost-time"></canvas>
                         </div>
                     </div>
                     <div class="chart-container">
-                        <h4>Coût par Véhicule</h4>
+                        <h4>${t('dashboard.cost_by_vehicle')}</h4>
                         <div class="chart-wrapper">
                             <canvas id="chart-cost-vehicle"></canvas>
                         </div>
@@ -88,7 +91,7 @@ class DashboardManager {
                 </div>
 
                 <!-- Notifications -->
-                <div class="section-title">Notifications</div>
+                <div class="section-title">${t('dashboard.notifications_title')}</div>
                 <div class="recent-list">
                     ${this._renderNotifications(documents)}
                 </div>
@@ -134,7 +137,7 @@ class DashboardManager {
                     vehicle: `${vehicle.make} ${vehicle.model}`,
                     date: nextDate,
                     days: daysUntil,
-                    type: 'Révision annuelle'
+                    type: window.I18n ? window.I18n.t('dashboard.annual_service') : 'Révision annuelle'
                 });
             }
         });
@@ -143,33 +146,40 @@ class DashboardManager {
     }
 
     _renderUpcomingMaintenance(upcoming) {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
+
         if (upcoming.length === 0) {
             return `
                 <div class="empty-state small" style="padding: 1rem;">
-                    <p>Aucun entretien prévu prochainement.</p>
+                    <p>${t('dashboard.no_upcoming')}</p>
                 </div>
             `;
         }
 
         return `
             <div class="upcoming-grid">
-                ${upcoming.map(item => `
-                    <div class="upcoming-card">
-                        <div class="upcoming-icon">🔧</div>
-                        <div class="upcoming-info">
-                            <div class="upcoming-title">${item.vehicle}</div>
-                            <div class="upcoming-desc">${item.type} - Dans ${item.days} jours</div>
+                ${upcoming.map(item => {
+            const inDaysText = t('dashboard.in_days').replace('{days}', item.days);
+            return `
+                        <div class="upcoming-card">
+                            <div class="upcoming-icon">🔧</div>
+                            <div class="upcoming-info">
+                                <div class="upcoming-title">${item.vehicle}</div>
+                                <div class="upcoming-desc">${item.type} - ${inDaysText}</div>
+                            </div>
+                            <div class="upcoming-date">${item.date.toLocaleDateString()}</div>
                         </div>
-                        <div class="upcoming-date">${item.date.toLocaleDateString()}</div>
-                    </div>
-                `).join('')}
+                    `;
+        }).join('')}
             </div>
         `;
     }
 
     _renderNotifications(documents) {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
+
         if (!window.DocumentManager) {
-            return '<p class="text-muted">Aucune notification.</p>';
+            return `<p class="text-muted">${t('dashboard.no_notifications')}</p>`;
         }
 
         const notifications = [];
@@ -177,24 +187,26 @@ class DashboardManager {
         documents.forEach(doc => {
             const status = window.DocumentManager.getStatus(doc.expiryDate);
             const vehicle = window.VehicleManager?.getAll().find(v => v.id === doc.vehicleId);
-            const vehicleName = vehicle ? `${vehicle.make} ${vehicle.model}` : 'Véhicule';
+            const vehicleName = vehicle ? `${vehicle.make} ${vehicle.model}` : t('dashboard.vehicle');
 
             if (status === 'expired') {
+                const expiredOnText = `${t('dashboard.expired_on')} ${new Date(doc.expiryDate).toLocaleDateString()}`;
                 notifications.push({
                     type: 'error',
                     icon: '🔴',
-                    title: `${doc.type} expiré`,
-                    message: `${vehicleName} - Expiré le ${new Date(doc.expiryDate).toLocaleDateString()}`,
+                    title: `${doc.type} ${t('dashboard.expired')}`,
+                    message: `${vehicleName} - ${expiredOnText}`,
                     date: new Date(doc.expiryDate)
                 });
             } else if (status === 'warning') {
                 const expiry = new Date(doc.expiryDate);
                 const diffDays = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
+                const expiresInText = t('dashboard.expires_in').replace('{days}', diffDays);
                 notifications.push({
                     type: 'warning',
                     icon: '🟠',
-                    title: `${doc.type} à renouveler`,
-                    message: `${vehicleName} - Expire dans ${diffDays} jour(s)`,
+                    title: `${doc.type} ${t('dashboard.to_renew')}`,
+                    message: `${vehicleName} - ${expiresInText}`,
                     date: expiry
                 });
             }
@@ -204,8 +216,8 @@ class DashboardManager {
             return `
                 <div class="empty-notification">
                     <span style="font-size:2rem;">✅</span>
-                    <p>Aucune notification</p>
-                    <p class="sub-text">Tous vos documents sont à jour !</p>
+                    <p>${t('dashboard.no_notifications')}</p>
+                    <p class="sub-text">${t('dashboard.all_docs_valid')}</p>
                 </div>
             `;
         }

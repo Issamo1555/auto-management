@@ -35,6 +35,20 @@ class ParkingFinder {
             maxZoom: 19
         }).addTo(this.map);
 
+        // Add Demo Mode indicator
+        const demoControl = L.control({ position: 'topright' });
+        demoControl.onAdd = function () {
+            const div = L.DomUtil.create('div', 'demo-mode-indicator');
+            div.innerHTML = '🗺️ Mode Démonstration';
+            div.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            div.style.padding = '5px 10px';
+            div.style.borderRadius = '5px';
+            div.style.fontWeight = 'bold';
+            div.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            return div;
+        };
+        demoControl.addTo(this.map);
+
         console.log('✅ Parking Finder Map initialized');
     }
 
@@ -156,6 +170,11 @@ class ParkingFinder {
                         <span class="${parking.available ? 'available' : 'full'}">
                             ${parking.available ? '✓ Disponible' : '✗ Complet'}
                         </span>
+                    </div>
+                    <div class="parking-actions" style="margin-top: 10px;">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${parking.lat},${parking.lng}" target="_blank" class="btn-secondary" style="display: block; text-align: center; text-decoration: none; padding: 5px; font-size: 0.9em;" onclick="event.stopPropagation()">
+                            📍 Y aller
+                        </a>
                     </div>
                 </div>
             `;

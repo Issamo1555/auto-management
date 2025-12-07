@@ -5,13 +5,17 @@
 class DocumentManager {
     constructor() {
         this.STORAGE_KEY = 'documents';
-        this.docTypes = [
-            'Permis de conduire',
-            'Assurance',
-            'Contrôle Technique',
-            'Carte Grise',
-            'Autre'
-        ];
+        // Document types will be translated dynamically
+        this.getDocTypes = () => {
+            const t = (key) => window.I18n ? window.I18n.t(key) : key;
+            return [
+                t('documents.type_license'),
+                t('documents.type_insurance'),
+                t('documents.type_technical'),
+                t('documents.type_registration'),
+                t('documents.type_other')
+            ];
+        };
     }
 
     getAll() {
@@ -51,11 +55,12 @@ class DocumentManager {
     }
 
     getStatusLabel(status) {
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
         switch (status) {
-            case 'expired': return 'Expiré';
-            case 'warning': return 'Bientôt';
-            case 'valid': return 'Valide';
-            default: return 'N/A';
+            case 'expired': return t('documents.expired');
+            case 'warning': return t('documents.expiring_soon');
+            case 'valid': return t('documents.valid');
+            default: return t('documents.unknown');
         }
     }
 
@@ -63,15 +68,16 @@ class DocumentManager {
 
     renderView(container) {
         const vehicles = window.VehicleManager ? window.VehicleManager.getAll() : [];
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
 
         if (vehicles.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon">🚫</div>
-                    <p>Aucun véhicule trouvé.</p>
-                    <p class="sub-text">Veuillez d'abord ajouter un véhicule pour gérer ses documents.</p>
+                    <p>${t('documents.no_vehicles')}</p>
+                    <p class="sub-text">${t('documents.add_vehicle_first')}</p>
                     <button class="btn btn-primary" style="margin-top:1rem" onclick="document.querySelector('[data-view=vehicles]').click()">
-                        Aller aux Véhicules
+                        ${t('documents.go_to_vehicles')}
                     </button>
                 </div>
             `;
@@ -84,13 +90,13 @@ class DocumentManager {
 
         const html = `
             <div class="module-header">
-                <h3>Documents</h3>
+                <h3>${t('documents.title')}</h3>
                 <div class="header-actions">
                     <select id="vehicle-selector" class="form-select">
                         ${vehicles.map(v => `<option value="${v.id}">${v.make} ${v.model} (${v.plate})</option>`).join('')}
                     </select>
                     <button id="btn-add-doc" class="btn btn-primary">
-                        <span class="icon">+</span> Nouveau Document
+                        <span class="icon">+</span> ${t('documents.add')}
                     </button>
                 </div>
             </div>
@@ -103,32 +109,32 @@ class DocumentManager {
             <div id="modal-add-doc" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4>Ajouter un Document</h4>
+                        <h4>${t('documents.new_document')}</h4>
                         <span class="close-modal">&times;</span>
                     </div>
                     <form id="form-add-doc">
                         <input type="hidden" name="vehicleId" id="modal-vehicle-id">
                         
                         <div class="form-group">
-                            <label>Type de document</label>
+                            <label>${t('documents.doc_type')}</label>
                             <select name="type" id="input-doc-type" required class="form-select">
-                                ${this.docTypes.map(t => `<option value="${t}">${t}</option>`).join('')}
+                                ${this.getDocTypes().map(t => `<option value="${t}">${t}</option>`).join('')}
                             </select>
-                            <input type="text" id="input-doc-type-other" name="typeOther" class="hidden" placeholder="Saisir le type de document" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
+                            <input type="text" id="input-doc-type-other" name="typeOther" class="hidden" placeholder="${t('documents.enter_type')}" style="width:100%; margin-top:5px; padding:0.5rem; border:1px solid var(--border-color); border-radius:var(--radius-md);">
                         </div>
                         
                         <div class="form-group">
-                            <label>Date d'expiration</label>
+                            <label>${t('documents.expiry_date')}</label>
                             <input type="date" name="expiryDate" required>
                         </div>
 
                         <div class="form-group">
-                            <label>Notes (Optionnel)</label>
-                            <input type="text" name="notes" placeholder="Numéro de police, détails...">
+                            <label>${t('documents.notes')}</label>
+                            <input type="text" name="notes" placeholder="${t('documents.notes_placeholder')}">
                         </div>
 
                         <div class="form-group">
-                            <label>Photo du document (optionnel)</label>
+                            <label>${t('documents.photo')}</label>
                             <input type="file" id="input-doc-photo" accept="image/*">
                             <input type="hidden" name="photo" id="hidden-doc-photo">
                             <div id="doc-photo-preview" style="margin-top:10px; display:none;">
@@ -137,8 +143,8 @@ class DocumentManager {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary close-modal">${t('common.cancel')}</button>
+                            <button type="submit" class="btn btn-primary">${t('common.save')}</button>
                         </div>
                     </form>
                 </div>
@@ -174,11 +180,12 @@ class DocumentManager {
     _renderDocumentList(container, vehicleId) {
         const listContainer = container.querySelector('#document-list-container');
         const documents = this.getByVehicle(vehicleId);
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
 
         if (documents.length === 0) {
             listContainer.innerHTML = `
                 <div class="empty-state small">
-                    <p>Aucun document pour ce véhicule.</p>
+                    <p>${t('documents.no_documents')}</p>
                 </div>
             `;
             return;
@@ -196,13 +203,13 @@ class DocumentManager {
                                 <span class="doc-type">${doc.type}</span>
                                 <span class="status-badge ${status}">${this.getStatusLabel(status)}</span>
                             </div>
-                            <div class="doc-date">Expire le: ${new Date(doc.expiryDate).toLocaleDateString()}</div>
+                            <div class="doc-date">${t('documents.expires_on')}: ${new Date(doc.expiryDate).toLocaleDateString()}</div>
                             ${doc.notes ? `<div class="doc-notes">${doc.notes}</div>` : ''}
                             ${doc.photo ? `<div style="margin-top:0.5rem;"><img src="${doc.photo}" style="max-width:100%; max-height:150px; border-radius:8px; cursor:pointer;" onclick="window.open('${doc.photo}', '_blank')" alt="Document photo" /></div>` : ''}
                         </div>
                         <div class="card-actions">
-                            <button class="btn-icon edit-doc" data-id="${doc.id}" title="Modifier">✎</button>
-                            <button class="btn-icon delete-doc" data-id="${doc.id}" title="Supprimer">✕</button>
+                            <button class="btn-icon edit-doc" data-id="${doc.id}" title="${t('common.edit')}">✎</button>
+                            <button class="btn-icon delete-doc" data-id="${doc.id}" title="${t('common.delete')}">✕</button>
                         </div>
                     </div>
                 `}).join('')}
@@ -216,9 +223,10 @@ class DocumentManager {
         const modal = container.querySelector('#modal-add-doc');
         const form = container.querySelector('#form-add-doc');
         const title = modal.querySelector('.modal-header h4');
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
 
         // Update Title
-        title.textContent = 'Modifier le Document';
+        title.textContent = t('documents.edit_document');
 
         // Fill Form
         form.querySelector('[name="type"]').value = doc.type;
@@ -279,10 +287,11 @@ class DocumentManager {
         // Custom Doc Type Logic
         const typeSelect = container.querySelector('#input-doc-type');
         const typeOtherInput = container.querySelector('#input-doc-type-other');
+        const t = (key) => window.I18n ? window.I18n.t(key) : key;
 
         if (typeSelect && typeOtherInput) {
             typeSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'Autre') {
+                if (e.target.value === t('documents.type_other')) {
                     typeOtherInput.classList.remove('hidden');
                     typeOtherInput.required = true;
                 } else {
@@ -300,10 +309,11 @@ class DocumentManager {
 
         // Open Modal (Add Mode)
         btnAdd.addEventListener('click', () => {
+            const t = (key) => window.I18n ? window.I18n.t(key) : key;
             // Reset Form
             form.reset();
             delete form.dataset.editingId;
-            modal.querySelector('.modal-header h4').textContent = 'Ajouter un Document';
+            modal.querySelector('.modal-header h4').textContent = t('documents.new_document');
             if (photoPreview) photoPreview.style.display = 'none';
             if (photoHidden) photoHidden.value = '';
 
@@ -332,7 +342,8 @@ class DocumentManager {
             const data = Object.fromEntries(formData.entries());
 
             // Handle "Other" type
-            if (data.type === 'Autre') {
+            const t = (key) => window.I18n ? window.I18n.t(key) : key;
+            if (data.type === t('documents.type_other')) {
                 data.type = data.typeOther;
             }
             delete data.typeOther;
@@ -365,15 +376,16 @@ class DocumentManager {
                     const btnCancel = document.getElementById('btn-confirm-cancel');
                     const btnClose = document.getElementById('close-confirm-modal');
 
+                    const t = (key) => window.I18n ? window.I18n.t(key) : key;
                     if (!modal) {
-                        if (confirm('Supprimer ce document ?')) {
+                        if (confirm(t('documents.delete_confirm'))) {
                             this.delete(docId);
                             this._renderDocumentList(container, selector.value);
                         }
                         return;
                     }
 
-                    msg.textContent = 'Êtes-vous sûr de vouloir supprimer ce document ?';
+                    msg.textContent = t('documents.delete_confirm');
                     modal.classList.remove('hidden');
 
                     const newBtnOk = btnOk.cloneNode(true);
